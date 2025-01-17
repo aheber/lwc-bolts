@@ -13,8 +13,7 @@
   ],
   "workspaces": [
     "packages/sf2ts",
-    "packages/typescript-plugin",
-    "packages/vscode-extension"
+    "packages/typescript-plugin"
   ],
   "author": {
     "name": "Anthony Heber",
