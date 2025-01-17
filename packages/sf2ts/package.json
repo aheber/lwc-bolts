@@ -1,0 +1,43 @@
+{
+  "name": "@lwc-bolts/sf2ts",
+  "version": "0.0.1",
+  "description": "Convert Salesforce metadata to TypeScript declarations",
+  "exports": {
+    ".": {
+      "module-sync": "./lib/index.mjs",
+      "module": "./lib/index.mjs",
+      "require": "./lib-cjs/bundle.cjs"
+    }
+  },
+  "scripts": {
+    "build": "rollup --config",
+    "watch": "rollup --config --watch",
+    "test": "node --test './tests/**/*.spec.*'"
+  },
+  "keywords": [
+    "salesforce",
+    "apex",
+    "typescript"
+  ],
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "web-tree-sitter-sfapex": "2.4.0",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@types/xml2js": "^0.4.14",
+    "rollup": "^4.30.1"
+  },
+  "files": [
+    "lib",
+    "lib-cjs",
+    "package.json",
+    "package-lock.json",
+    "README.MD"
+  ]
+}

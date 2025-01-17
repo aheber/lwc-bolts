@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "checkJs": true,
+    "strict": true
+  },
+  "exclude": ["lib-cjs"]
+}

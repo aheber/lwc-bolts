@@ -1,0 +1,52 @@
+{
+  "name": "lwc-bolts-vscode",
+  "private": true,
+  "displayName": "Lightning Bolts for LWC",
+  "description": "Bolt your LWC components together better",
+  "version": "0.0.1",
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:sfdx-project.json"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "typescriptServerPlugins": [
+      {
+        "name": "lwc-bolts-typescript-plugin",
+        "enableForWorkspaceTypeScriptVersions": true
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "build:extension": "vsce package",
+    "build:linkjuggle": "npm unlink lwc-bolts-typescript-plugin && cp -r ../typescript-plugin/ node_modules/lwc-bolts-typescript-plugin && npm run build:extension && npm link ../typescript-plugin",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./dist/test/runTest.js",
+    "test:nonext": "mocha --require ts-node/register src/test/suite/non-ext-tests/parser.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "18.x",
+    "@types/vscode": "^1.84.0",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "@vscode/test-electron": "^2.3.6",
+    "eslint": "^8.52.0"
+  },
+  "dependencies": {
+    "@lwc-bolts/typescript-plugin": "^0.0.1"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "@lwc-bolts/typescript-plugin",
+  "version": "0.0.1",
+  "description": "Typescript language plugin for Lightning Web Components",
+  "main": "./dist/",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "TBD"
+  },
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@salesforce/source-deploy-retrieve": "^12.10.4",
+    "@lwc-bolts/sf2ts": "^0.0.1"
+  },
+  "files": [
+    "./dist",
+    "README.md",
+    "package.json",
+    "package-lock.json"
+  ]
+}

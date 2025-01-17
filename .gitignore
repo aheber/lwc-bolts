@@ -1,0 +1,4 @@
+node_modules
+packages/sf2ts/lib-cjs
+.DS_Store
+dist

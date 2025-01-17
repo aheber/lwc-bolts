@@ -1,0 +1,31 @@
+{
+  "name": "@lwc-bolts/monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Lightning Bolts is an enrichment package for Lightning Web Components (LWC)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lwc",
+    "lightning-web-components"
+  ],
+  "workspaces": [
+    "packages/sf2ts",
+    "packages/typescript-plugin",
+    "packages/vscode-extension"
+  ],
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^22.10.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
+}
