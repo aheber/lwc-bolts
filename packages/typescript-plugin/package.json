@@ -1,6 +1,6 @@
 {
   "name": "@lwc-bolts/typescript-plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Typescript language plugin for Lightning Web Components",
   "main": "./dist/",
   "type": "commonjs",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@salesforce/source-deploy-retrieve": "^12.10.4",
-    "@lwc-bolts/sf2ts": "^0.0.1"
+    "@lwc-bolts/sf2ts": "^0.0.2"
   },
   "files": [
     "./dist",

@@ -22,7 +22,7 @@
   "contributes": {
     "typescriptServerPlugins": [
       {
-        "name": "lwc-bolts-typescript-plugin",
+        "name": "@lwc-bolts/typescript-plugin",
         "enableForWorkspaceTypeScriptVersions": true
       }
     ]
@@ -30,7 +30,6 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "build:extension": "vsce package",
-    "build:linkjuggle": "npm unlink lwc-bolts-typescript-plugin && cp -r ../typescript-plugin/ node_modules/lwc-bolts-typescript-plugin && npm run build:extension && npm link ../typescript-plugin",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
@@ -48,6 +47,6 @@
     "eslint": "^8.52.0"
   },
   "dependencies": {
-    "@lwc-bolts/typescript-plugin": "^0.0.1"
+    "@lwc-bolts/typescript-plugin": "^0.0.2"
   }
 }

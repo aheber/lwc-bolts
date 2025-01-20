@@ -109,12 +109,16 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
           .forEach((c) => {
             if (registryCache) {
               // find CustomField xml and push into registry cache
-              const fields = rslvr
-                .getComponentsFromPath(
-                  `${(c as any).xml.split("/").slice(0, -1).join("/")}/fields/`
-                )
-                .map((c) => c.xml ?? "");
-              registryCache.push(...fields);
+              try {
+                const fields = rslvr
+                  .getComponentsFromPath(
+                    `${(c as any).xml.split("/").slice(0, -1).join("/")}/fields/`
+                  )
+                  .map((c) => c.xml ?? "");
+                registryCache.push(...fields);
+              } catch (err) {
+                console.error(err);
+              }
             }
           });
 
