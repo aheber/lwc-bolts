@@ -25,7 +25,7 @@ describe("Convert:CustomField", async () => {
     let convertedComp = convert([component]);
     assert.equal(
       convertedComp[0].declarationContent,
-      `declare module '@salesforce/schema/Test_Object__c.Test_Checkbox__c' {
+      `declare module "@salesforce/schema/Test_Object__c.Test_Checkbox__c" {
   /**
    * @description Test it helptest
    * @description Test field of type checkbox
@@ -37,5 +37,12 @@ describe("Convert:CustomField", async () => {
   export default Test_Checkbox__c;
 }`
     );
+
+    assert.deepEqual(convertedComp[0].mapData, [
+      { sourcePos: 115, destPos: 15 },
+      { sourcePos: 131, destPos: 67 },
+      { sourcePos: 115, destPos: 171 },
+      { sourcePos: 131, destPos: 187 },
+    ]);
   });
 });

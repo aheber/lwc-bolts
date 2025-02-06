@@ -1,5 +1,6 @@
 /** @import { Component, ConvertedComponent } from "../index.mjs" */
 import { parseString } from "xml2js";
+import { PositionAwareTextBuilder } from "../util.mjs";
 
 /**
  *
@@ -17,14 +18,34 @@ export function CustomObject(component) {
     obj = result;
   });
   const objectName = component.path.split("/").pop()?.split(".")[0];
-  const dec = `declare module '@salesforce/schema/${objectName}' {
+  if (!objectName) {
+    throw new Error("Unable to find Object Name");
+  }
+
+  const namePos = component.content.indexOf("<label>") + "<label>".length;
+  const namePosEnd = component.content.indexOf("</label>");
+
+  const builder = new PositionAwareTextBuilder();
+  builder.addText(`declare module `);
+  builder.addText(`"@salesforce/schema/${objectName}"`, namePos, namePosEnd);
+  builder.addText(
+    ` {
   /**
    * @description ${obj.CustomObject.description}
    */
-  const ${objectName}: {
+  const `
+  );
+  builder.addText(`${objectName}`, namePos, namePosEnd);
+  builder.addText(
+    `: {
       objectApiName: '${objectName}';
   }
   export default ${objectName};
-}`;
-  return { declarationContent: dec, mapData: [], ...component };
+}`
+  );
+  return {
+    declarationContent: builder.build(),
+    mapData: builder.getMappings(),
+    ...component,
+  };
 }

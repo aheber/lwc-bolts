@@ -4,21 +4,15 @@ import {
   MetadataResolver,
 } from "@salesforce/source-deploy-retrieve";
 import type { SourceComponent } from "@salesforce/source-deploy-retrieve";
-import { getApexParser } from "web-tree-sitter-sfapex";
-import type Parser from "web-tree-sitter";
-import { convert, MetadataType } from "@lwc-bolts/sf2ts";
+import { convert, MapPair, MetadataType } from "@lwc-bolts/sf2ts";
 
 /* TODO:
-// go to definition working on all virtual metadata
-// should store and depend on mapping data
-// should store "snapshot" of metadata files
 // should figure out how to watch files for saves and refresh (should be able to lean on tsserver)
  */
 
-let prsr: Parser;
-
-let moduleRegistryCache: Map<string, string[]> = new Map();
-let lwcRegistryCache: Map<string, string[]> = new Map();
+let moduleRegistryCache = new Map<string, string[]>();
+let lwcRegistryCache = new Map<string, string[]>();
+let mdtFileCache = new Map<string, ReturnType<typeof convert>>();
 
 function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
   // const modTs = modules.typescript;
@@ -154,12 +148,6 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
     // setup component aliases
     addComponentPaths(info.project, sfdxProjectRoot);
 
-    // start loading the Apex parser WASM library, must be an async action
-    getApexParser().then((newParser) => {
-      info.project.projectService.logger.info("Apex parser ready");
-      prsr = newParser;
-    });
-
     // Diagnostic logging
     info.project.projectService.logger.info(
       "I'm getting set up now! Check the log for this message."
@@ -172,19 +160,19 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
     ) => {
       let mdtType: string = "";
       if (path.endsWith(".cls")) {
-        mdtType = "ApexClass";
+        mdtType = MetadataType.ApexClass;
       } else if (path.endsWith(".customPermission-meta.xml")) {
-        mdtType = "CustomPermission";
+        mdtType = MetadataType.CustomPermission;
       } else if (path.endsWith(".resource-meta.xml")) {
-        mdtType = "StaticResource";
+        mdtType = MetadataType.StaticResource;
       } else if (path.endsWith(".labels-meta.xml")) {
-        mdtType = "CustomLabels";
+        mdtType = MetadataType.CustomLabels;
       } else if (path.endsWith(".object-meta.xml")) {
-        mdtType = "CustomObject";
+        mdtType = MetadataType.CustomObject;
       } else if (path.endsWith(".field-meta.xml")) {
-        mdtType = "CustomField";
+        mdtType = MetadataType.CustomField;
       } else if (path.endsWith(".asset-meta.xml")) {
-        mdtType = "ContentAsset";
+        mdtType = MetadataType.ContentAsset;
       }
       if (mdtType.length > 0) {
         const text = readFile(path);
@@ -193,6 +181,7 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
             const cnvtdComp = convert([
               { path, type: mdtType as any, content: text },
             ]);
+            mdtFileCache.set(path, cnvtdComp);
             return cnvtdComp[0].declarationContent;
           } catch (error) {
             // a failure to parse the file because we're waiting for async tasks to finish
@@ -267,65 +256,24 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
       // TODO: handle more data types like Custom Labels, Custom Permissions, etc...
 
       // find any
+
       output?.definitions
-        ?.filter((def) =>
-          moduleRegistryCache.get(sfdxProjectRoot)?.includes(def.fileName)
-        )
+        ?.filter((def) => mdtFileCache.has(def.fileName))
         .forEach((def) => {
-          let targetMethodName = def.name;
-          if (def.kind === "module") {
-            targetMethodName = def.name.replaceAll('"', "").split(".")[1];
-          }
-          const text = readFile(def.fileName);
-          if (!text) {
+          const cmpntList = mdtFileCache.get(def.fileName);
+          if (!cmpntList || cmpntList.length == 0) {
             return;
           }
-          const tree = prsr.parse(text);
-          // build query to find all top-level method names
-          const qry = prsr
-            .getLanguage()
-            .query(
-              `(parser_output (class_declaration (class_body (method_declaration name: (identifier) @method_name))))`
-            );
-          // search the parsed file using the above query
-          const captures = qry.captures(tree.rootNode);
-          // for each found element, see if the method name matches our target
-          const targetMethodCap = captures.find((cap) => {
-            if (cap.node.text !== targetMethodName) {
-              return false;
-            }
-            if (!cap.node.parent) {
-              return false;
-            }
-            // ensure this method is AuraEnabled
-            const modifiersNode = cap.node.parent.namedChildren.find(
-              (c) => c.type === "modifiers"
-            );
-            if (!modifiersNode) {
-              return false;
-            }
-            return modifiersNode.namedChildren.some(
-              (c) =>
-                c.childForFieldName("name")?.text.toLowerCase() ===
-                "auraenabled"
-            );
-          });
-          const node = targetMethodCap?.node;
-          if (node) {
-            def.textSpan.start = node.startIndex ?? 0;
-            def.textSpan.length = (node.endIndex ?? 0) - (node.startIndex ?? 0);
-            const parentNode = node.parent;
-            if (parentNode) {
-              if (!def.contextSpan) {
-                def.contextSpan = {
-                  start: 0,
-                  length: 0,
-                };
-              }
-              def.contextSpan.start = parentNode.startIndex ?? 0;
-              def.contextSpan.length =
-                (parentNode.endIndex ?? 0) - (parentNode.startIndex ?? 0);
-            }
+          const cmpnt = cmpntList[0];
+
+          const index = cmpnt.mapData.findIndex(
+            (m: MapPair) => m.destPos == def.textSpan.start
+          );
+          if (cmpnt.mapData.length > index) {
+            const start = cmpnt.mapData[index];
+            const end = cmpnt.mapData[index + 1];
+            def.textSpan.start = start.sourcePos;
+            def.textSpan.length = end.sourcePos - start.sourcePos;
           }
         });
 

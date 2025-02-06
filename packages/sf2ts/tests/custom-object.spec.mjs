@@ -25,7 +25,7 @@ describe("Convert:CustomObject", async () => {
     let convertedComp = convert([component]);
     assert.equal(
       convertedComp[0].declarationContent,
-      `declare module '@salesforce/schema/Test_Object__c' {
+      `declare module "@salesforce/schema/Test_Object__c" {
   /**
    * @description Object representing test data
    */
@@ -35,5 +35,12 @@ describe("Convert:CustomObject", async () => {
   export default Test_Object__c;
 }`
     );
+
+    assert.deepEqual(convertedComp[0].mapData, [
+      { sourcePos: 224, destPos: 15 },
+      { sourcePos: 235, destPos: 50 },
+      { sourcePos: 224, destPos: 121 },
+      { sourcePos: 235, destPos: 135 },
+    ]);
   });
 });

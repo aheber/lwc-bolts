@@ -1,8 +1,7 @@
 /** @import Parser from "web-tree-sitter" */
-/** @import { Component, ConvertedComponent } from "../index.mjs" */
+/** @import { Component, ConvertedComponent, MapPair } from "../index.mjs" */
 import { getApexParser } from "web-tree-sitter-sfapex";
-
-// TOOD: Apex Continuation
+import { PositionAwareTextBuilder } from "../util.mjs";
 
 /** @type { Parser } */
 let prsr;
@@ -25,32 +24,24 @@ export function ApexClass(comp) {
     throw err;
   }
 
-  const [className, declarationContent, mappingContent] =
-    buildDeclarationForApexFile(prsr, comp.path, comp.content, false);
+  const [declarationContent, mappingContent] = buildDeclarationForApexFile(
+    prsr,
+    comp.content,
+    false
+  );
   if (declarationContent === undefined) {
     throw new Error("Problem building declaration content");
   }
+  if (mappingContent === undefined) {
+    throw new Error("Problem building declaration content mappings");
+  }
 
-  return { ...comp, declarationContent: declarationContent, mapData: [] };
+  return {
+    ...comp,
+    declarationContent: declarationContent,
+    mapData: mappingContent,
+  };
 }
-
-/**
- * @typedef DeltaPoint
- * @property {number} rowDelta
- * @property {number} column
- */
-
-/**
- * @typedef MappingPos
- * @property {DeltaPoint} startPosition
- * @property {DeltaPoint} endPosition
- */
-
-/**
- * @typedef Mapping
- * @property { MappingPos } dPos
- * @property { {startPosition: Parser.Point, endPosition: Parser.Point }?} sPos
- */
 
 /** @type { Record<string, string> } */
 const typeOverrides = {
@@ -67,20 +58,22 @@ let localNestedClasses = [];
 /** @type { string? } */
 let outerClassName;
 
+// TODO: probably don't want this to be a global
+let builder = new PositionAwareTextBuilder();
+
 /**
  *
  * @param {Parser} parser
- * @param {string} relativeFilePath
  * @param {string} apexText
  * @param {boolean} isSobject
- * @returns { string[] }
+ * @returns { [string, MapPair[]] | [] }
  */
 export function buildDeclarationForApexFile(
   parser,
-  relativeFilePath,
   apexText,
   isSobject = false
 ) {
+  builder = new PositionAwareTextBuilder();
   try {
     const tree = parser.parse(apexText);
     // step into top-level class, if any
@@ -91,15 +84,10 @@ export function buildDeclarationForApexFile(
       return []; // this isn't a class
     }
 
-    // TODO: build mapping file
-    const [className, declarationText, mappings] = processClass(
-      classes[0],
-      isSobject
-    );
-    const mappingText = getMapFile(className, relativeFilePath, mappings);
+    processClass(classes[0], isSobject);
     localNestedClasses = [];
     outerClassName = null;
-    return [className, declarationText, mappingText];
+    return [builder.build(), builder.getMappings()];
   } catch (error) {
     console.error(error);
 
@@ -113,20 +101,19 @@ export function buildDeclarationForApexFile(
  *
  * @param {Parser.SyntaxNode} classNode
  * @param {boolean} isSobject
- * @returns { [string, string, Mapping[]] }
  */
 function processClass(classNode, isSobject) {
-  let className = classNode.childForFieldName("name")?.text ?? "";
+  const classNameNode = classNode.childForFieldName("name");
+  if (!classNameNode) {
+    throw new Error("Class Name Node not found");
+  }
+  let className = classNameNode?.text ?? "";
   if (!outerClassName) {
     outerClassName = className;
   }
   let classBody = classNode.childForFieldName("body");
-  /** @type {Mapping[]} */
-  const mappings = [];
-  /** @type {string[]} */
-  let outputText = [];
   if (!classBody) {
-    return [className, outputText.join(""), mappings];
+    return;
   }
 
   const methodsToProcess = [];
@@ -153,194 +140,85 @@ function processClass(classNode, isSobject) {
     }
   }
   if (fieldsToProcess.length > 0) {
-    outputText.push(`declare interface ${className} {\n`);
-    mappings.push({
-      dPos: {
-        startPosition: {
-          rowDelta: 0,
-          column: 0,
-        },
-        endPosition: {
-          rowDelta: 0,
-          column: 0,
-        },
-      },
-      sPos: null,
-    });
+    builder.addText("declare interface ");
+    builder.addText(
+      className,
+      classNameNode.startIndex,
+      classNameNode.endIndex
+    );
+    builder.addText(" {\n");
     for (let fNode of fieldsToProcess) {
-      const [newOutputText, newMappings] = transformFieldDeclaration(
-        fNode,
-        isSobject
-      );
-      outputText.push(newOutputText);
-      mappings.push(...newMappings);
+      transformFieldDeclaration(fNode, isSobject);
     }
-    outputText.push("}\n");
-    mappings.push({
-      dPos: {
-        startPosition: {
-          rowDelta: 1,
-          column: 0,
-        },
-        endPosition: {
-          rowDelta: 0,
-          column: 0,
-        },
-      },
-      sPos: null,
-    });
+    builder.addText("}\n");
   }
 
   if (classesToProcess.length > 0) {
-    outputText.push(`declare namespace ${className} {\n`);
-    mappings.push({
-      dPos: {
-        startPosition: {
-          rowDelta: 2,
-          column: 0,
-        },
-        endPosition: {
-          rowDelta: 0,
-          column: 0,
-        },
-      },
-      sPos: null,
-    });
+    builder.addText("declare namespace ");
+    builder.addText(
+      className,
+      classNameNode.startIndex,
+      classNameNode.endIndex
+    );
+    builder.addText(" {\n");
     for (const cNode of classesToProcess) {
-      const [className, newOutputText, newMappings] = processClass(
-        cNode,
-        isSobject
-      );
-      if (newOutputText.length > 0) {
-        outputText.push("  " + newOutputText.replaceAll(/\n(.)/g, "\n  $1"));
-        mappings.push(...newMappings);
-      }
+      processClass(cNode, isSobject);
       // TODO: somehow queue up local classes for type resolution
     }
 
-    outputText.push(`}\n`);
-    mappings.push({
-      dPos: {
-        startPosition: {
-          rowDelta: 2,
-          column: 0,
-        },
-        endPosition: {
-          rowDelta: 0,
-          column: 0,
-        },
-      },
-      sPos: null,
-    });
+    builder.addText("}\n");
   }
 
   for (const mNode of methodsToProcess) {
-    const [newOutputText, newMappings] = transformMethodDeclaration(
-      className,
-      mNode
-    );
-    outputText.push(newOutputText);
-    mappings.push(...newMappings);
+    transformMethodDeclaration(classNameNode, mNode);
   }
-  return [className, outputText.join(""), mappings];
 }
 
 /**
  *
- * @param {string} className
+ * @param {Parser.SyntaxNode} classNameNode
  * @param {Parser.SyntaxNode} methodNode
- * @returns {[string, Mapping[]]}
  */
-function transformMethodDeclaration(className, methodNode) {
-  /** @type {Mapping[]} */
-  const mappings = [];
+function transformMethodDeclaration(classNameNode, methodNode) {
   const methodNameNode = methodNode.childForFieldName("name");
   if (!methodNameNode) {
-    return ["", mappings];
+    return;
   }
   const methodName = methodNameNode.text;
   const returnType = methodNode.childForFieldName("type");
   if (!returnType) {
-    return ["", mappings];
+    return;
   }
   const parameters = getMethodParameters(methodNode);
 
   const auraEnabledNode = getAuraEnabledAnnotation(methodNode);
   if (!auraEnabledNode) {
     // method doesn't hold the AuraEnabled Annotation
-    return ["", mappings];
+    return;
   }
   const isCacheableEnabled = getAuraEnabledIsCacheable(auraEnabledNode);
+  const isContinuation = getAuraEnabledIsContinuation(auraEnabledNode);
 
-  const [newOutputText, methodNameMapping] = declarationString(
-    className,
-    methodName,
+  // TODO: continuation return type is actually the return type of the `continuationMethod` referenced in the Continuation object
+  declarationString(
+    classNameNode,
+    methodNameNode,
     getType(returnType),
     parameters,
-    isCacheableEnabled
+    isCacheableEnabled,
+    isContinuation
   );
-  const declarationParts = newOutputText.split("\n");
-  methodNameMapping.rowDelta;
-
-  mappings.push({
-    dPos: {
-      startPosition: methodNameMapping,
-      endPosition: {
-        rowDelta: methodNameMapping.rowDelta,
-        column: methodNameMapping.column + methodName.length,
-      },
-    },
-    sPos: {
-      startPosition: methodNameNode.startPosition,
-      endPosition: methodNameNode.endPosition,
-    },
-  });
-  // add consumption of remaining lines
-  mappings.push({
-    dPos: {
-      startPosition: {
-        rowDelta: declarationParts.length - methodNameMapping.rowDelta,
-        column: 0,
-      },
-      endPosition: {
-        rowDelta: declarationParts.length - methodNameMapping.rowDelta,
-        column: 0,
-      },
-    },
-    sPos: null,
-  });
-  return [newOutputText, mappings];
 }
 
 /**
  *
  * @param {Parser.SyntaxNode} node
  * @param {boolean} isSobject
- * @returns {[string, Mapping[]]}
  */
 function transformFieldDeclaration(node, isSobject) {
   /** @type {string[]} */
   let deprecatedReasons = [];
-  let output = "";
   const modifiers = node.descendantsOfType("modifiers");
-  /** @type {Mapping} */
-  const mapping = {
-    dPos: {
-      startPosition: {
-        rowDelta: 1,
-        column: 2,
-      },
-      endPosition: {
-        // TODO
-        rowDelta: 0,
-        column: 0,
-      },
-    },
-    sPos: {
-      startPosition: node.startPosition,
-      endPosition: node.endPosition,
-    },
-  };
 
   if (modifiers.length === 0 || !modifiers[0]) {
     deprecatedReasons.push("public or global");
@@ -373,21 +251,39 @@ function transformFieldDeclaration(node, isSobject) {
       deprecatedReasons.push("public or global");
     }
   }
-  /** TODO:
+  /**
    * determine if AuraEnabled & public or global & not static
    * otherwise mark as deprecated with note (dynamic based on missing access component)
    * {property}: {getType({type})}?;
    */
   if (deprecatedReasons.length > 0) {
-    mapping.dPos.startPosition.rowDelta++;
-    output += `  /** @deprecated not exposed; property must be ${deprecatedReasons.join(
-      ", "
-    )} */\n`;
+    builder.addText(
+      `  /** @deprecated not exposed; property must be ${deprecatedReasons.join(
+        ", "
+      )} */\n`
+    );
   }
-  output += `  ${
-    node.childForFieldName("declarator")?.childForFieldName("name")?.text ?? ""
-  }?: ${getType(node.childForFieldName("type"))};\n`;
-  return [output, [mapping]];
+  const nameNode = node
+    .childForFieldName("declarator")
+    ?.childForFieldName("name");
+  builder.addText("  ");
+  if (!nameNode) {
+    throw new Error("Field doesn't have a name");
+  }
+  builder.addText(
+    `${nameNode?.text ?? ""}`,
+    nameNode.startIndex,
+    nameNode.endIndex
+  );
+  builder.addText("?: ");
+  const typeNode = node.childForFieldName("type");
+  if (!typeNode) {
+    throw new Error("Type node not found");
+  }
+  const typeText = getType(typeNode);
+  builder.addText(typeText, typeNode.startIndex, typeNode.endIndex);
+  builder.addText(";\n");
+  const moreText = `;\n`;
 }
 
 /**
@@ -405,6 +301,30 @@ function getAuraEnabledIsCacheable(node) {
         k &&
         v &&
         k.text.toLowerCase() === "cacheable" &&
+        v.text.toLowerCase() === "true"
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ *
+ * @param {Parser.SyntaxNode} node
+ * @returns {boolean}
+ */
+function getAuraEnabledIsContinuation(node) {
+  const args = node.childForFieldName("arguments");
+  if (args) {
+    for (const a of args.descendantsOfType("annotation_key_value")) {
+      const k = a.childForFieldName("key");
+      const v = a.childForFieldName("value");
+      if (
+        k &&
+        v &&
+        k.text.toLowerCase() === "continuation" &&
         v.text.toLowerCase() === "true"
       ) {
         return true;
@@ -452,22 +372,36 @@ function getMethodParameters(node) {
 
 /**
  *
- * @param {string} className
- * @param {string} methodName
+ * @param {Parser.SyntaxNode} classNameNode
+ * @param {Parser.SyntaxNode} methodNameNode
  * @param {string} returnType
  * @param {Map<string, string>} params
  * @param {boolean} isCacheable
- * @returns {[string, DeltaPoint]}
+ * @param {boolean} isContinuation
  */
 function declarationString(
-  className,
-  methodName,
+  classNameNode,
+  methodNameNode,
   returnType,
   params,
-  isCacheable
+  isCacheable,
+  isContinuation
 ) {
-  let text = `declare module "@salesforce/apex/${className}.${methodName}" {
-  const ${methodName}: {
+  builder.addText("declare module ");
+  // if method has Containuation
+  builder.addText(
+    `"@salesforce/apex${isContinuation ? "Continuation" : ""}/${classNameNode.text}.${methodNameNode.text}"`,
+    methodNameNode.startIndex,
+    methodNameNode.endIndex
+  );
+  builder.addText(` {
+  const `);
+  builder.addText(
+    methodNameNode.text,
+    methodNameNode.startIndex,
+    methodNameNode.endIndex
+  );
+  builder.addText(`: {
     (${
       params.size === 0
         ? ""
@@ -492,64 +426,9 @@ function declarationString(
     >;`
     }
   };
-  export default `;
-  // analyze how much text we're adding before the method name
-  const lines = text.split("\n");
-  /** @type {DeltaPoint} */
-  const m = {
-    rowDelta: lines.length - 1,
-    column: lines[lines.length - 1]?.length ?? 0,
-  };
-  // finish building
-  text += `${methodName};
+  export default ${methodNameNode.text};
 }
-`;
-  return [text, m];
-}
-
-/**
- *
- * @param {string} className
- * @param {string} relativeClassPath
- * @param {Mapping[]} mappings
- * @returns
- */
-function getMapFile(className, relativeClassPath, mappings) {
-  let mappingsString = "";
-  let lastSourceRow = 0;
-  let lastMethodColumnNum = 0;
-  for (const m of mappings) {
-    mappingsString += ";".repeat(m.dPos.startPosition.rowDelta);
-    if (!m.sPos) {
-      continue;
-    }
-    /**
-     * Generated column
-     * Original file this appeared in
-     * Original line number relative to last given value in this field
-     * Original column relative to last given value in this field
-     */
-    // const incrementalColumnCount =
-    //   m.sPos.startPosition.column - lastMethodColumnNum;
-
-    // mappingsString += `${encode(m.dPos.startPosition.column)}${encode(
-    //   0
-    // )}${encode(m.sPos.startPosition.row - lastSourceRow)}${encode(
-    //   incrementalColumnCount
-    // )}`;
-
-    lastMethodColumnNum = m.sPos.startPosition.column;
-    lastSourceRow = m.sPos.startPosition.row;
-  }
-  return JSON.stringify({
-    version: 3,
-    file: `${className}.d.ts`,
-    sourceRoot: "",
-    // TODO: not so badly hardcoded
-    sources: [`../../../../../${relativeClassPath}`],
-    names: [],
-    mappings: mappingsString,
-  });
+`);
 }
 
 /**

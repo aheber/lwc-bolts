@@ -30,5 +30,12 @@ describe("Convert:CustomPermission", async () => {
   export default hasTestPerm;
 }`
     );
+
+    assert.deepEqual(convertedComp[0].mapData, [
+      { sourcePos: 209, destPos: 15 },
+      { sourcePos: 221, destPos: 54 },
+      { sourcePos: 209, destPos: 150 },
+      { sourcePos: 221, destPos: 161 },
+    ]);
   });
 });

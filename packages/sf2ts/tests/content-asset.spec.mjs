@@ -32,9 +32,16 @@ describe("Convert:StaticResource", async () => {
     assert.equal(
       convertedComp[0].declarationContent,
       `declare module "@salesforce/contentAssetUrl/Image9" {
-  var Image9: string;
+  const Image9: string;
   export default Image9;
 }`
     );
+
+    assert.deepEqual(convertedComp[0].mapData, [
+      { sourcePos: 213, destPos: 15 },
+      { sourcePos: 219, destPos: 51 },
+      { sourcePos: 213, destPos: 62 },
+      { sourcePos: 219, destPos: 68 },
+    ]);
   });
 });

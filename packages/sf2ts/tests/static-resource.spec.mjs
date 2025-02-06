@@ -29,5 +29,12 @@ describe("Convert:StaticResource", async () => {
   export default TextRaw;
 }`
     );
+
+    assert.deepEqual(convertedComp[0].mapData, [
+      { sourcePos: 204, destPos: 15 },
+      { sourcePos: 228, destPos: 48 },
+      { sourcePos: 204, destPos: 135 },
+      { sourcePos: 228, destPos: 142 },
+    ]);
   });
 });

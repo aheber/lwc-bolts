@@ -1,5 +1,6 @@
 /** @import { Component, ConvertedComponent } from "../index.mjs" */
 import { parseString } from "xml2js";
+import { PositionAwareTextBuilder } from "../util.mjs";
 
 /**
  *
@@ -7,7 +8,6 @@ import { parseString } from "xml2js";
  * @returns {ConvertedComponent}
  */
 export function CustomPermission(component) {
-  // generate d.ts
   /** @type {any} */
   let perm;
   parseString(component.content, (error, result) => {
@@ -17,14 +17,35 @@ export function CustomPermission(component) {
     perm = result;
   });
   const permName = component.path.split("/").pop()?.split(".")[0];
-  const dec = `declare module "@salesforce/customPermission/${permName}" {
+  const namePosStart = component.content.indexOf("<label>") + "<label>".length;
+  const namePosEnd = component.content.indexOf("</label>");
+
+  const builder = new PositionAwareTextBuilder();
+  builder.addText("declare module ");
+  builder.addText(
+    `"@salesforce/customPermission/${permName}"`,
+    namePosStart,
+    namePosEnd
+  );
+
+  builder.addText(
+    ` {
   /**
    * ${perm.CustomPermission.label}
    *
    * @description ${perm.CustomPermission.description}
    */
-  const has${permName}:boolean;
+  const `
+  );
+  builder.addText(`has${permName}`, namePosStart, namePosEnd);
+  builder.addText(
+    `:boolean;
   export default has${permName};
-}`;
-  return { declarationContent: dec, mapData: [], ...component };
+}`
+  );
+  return {
+    declarationContent: builder.build(),
+    mapData: builder.getMappings(),
+    ...component,
+  };
 }

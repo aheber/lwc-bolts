@@ -1,5 +1,6 @@
 /** @import { Component, ConvertedComponent } from "../index.mjs" */
 import { parseString } from "xml2js";
+import { PositionAwareTextBuilder } from "../util.mjs";
 
 /**
  *
@@ -16,9 +17,32 @@ export function ContentAsset(component) {
     }
     asset = result;
   });
-  const dec = `declare module "@salesforce/contentAssetUrl/${asset.ContentAsset.masterLabel}" {
-  var ${asset.ContentAsset.masterLabel}: string;
-  export default ${asset.ContentAsset.masterLabel};
-}`;
-  return { declarationContent: dec, mapData: [], ...component };
+  const label = asset.ContentAsset.masterLabel[0];
+  const namePosStart =
+    component.content.indexOf("<masterLabel>") + "<masterLabel>".length;
+  const namePosEnd = namePosStart + label.length;
+
+  const builder = new PositionAwareTextBuilder();
+
+  builder.addText(`declare module `);
+  builder.addText(
+    `"@salesforce/contentAssetUrl/${label}"`,
+    namePosStart,
+    namePosEnd
+  );
+  builder.addText(
+    ` {
+  const `
+  );
+  builder.addText(label, namePosStart, namePosEnd);
+  builder.addText(
+    `: string;
+  export default ${label};
+}`
+  );
+  return {
+    declarationContent: builder.build(),
+    mapData: builder.getMappings(),
+    ...component,
+  };
 }

@@ -64,5 +64,20 @@ declare module "@salesforce/label/c.Austria" {
 }
 `
     );
+
+    assert.deepEqual(convertedComp[0].mapData, [
+      { sourcePos: 133, destPos: 15 },
+      { sourcePos: 140, destPos: 44 },
+      { sourcePos: 133, destPos: 105 },
+      { sourcePos: 140, destPos: 115 },
+      { sourcePos: 414, destPos: 179 },
+      { sourcePos: 423, destPos: 210 },
+      { sourcePos: 414, destPos: 261 },
+      { sourcePos: 423, destPos: 273 },
+      { sourcePos: 685, destPos: 337 },
+      { sourcePos: 692, destPos: 366 },
+      { sourcePos: 685, destPos: 415 },
+      { sourcePos: 692, destPos: 425 },
+    ]);
   });
 });

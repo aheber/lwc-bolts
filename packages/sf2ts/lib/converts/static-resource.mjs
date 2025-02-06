@@ -1,5 +1,6 @@
 /** @import { Component, ConvertedComponent } from "../index.mjs" */
 import { parseString } from "xml2js";
+import { PositionAwareTextBuilder } from "../util.mjs";
 
 /**
  *
@@ -17,13 +18,39 @@ export function StaticResource(component) {
     resource = result;
   });
   const resourceName = component.path.split("/").pop()?.split(".")[0];
-  const dec = `declare module "@salesforce/resourceUrl/${resourceName}" {
+  const namePosStart =
+    component.content.indexOf("<description>") + "<description>".length;
+  const namePosEnd = component.content.indexOf("</description>");
+
+  const builder = new PositionAwareTextBuilder();
+
+  builder.addText("declare module ");
+
+  builder.addText(
+    `"@salesforce/resourceUrl/${resourceName}"`,
+    namePosStart,
+    namePosEnd
+  );
+
+  builder.addText(
+    ` {
   /**
    * @description ${resource.StaticResource.description}
    * @access ${resource.StaticResource.cacheControl}
    */
-  const ${resourceName}:string;
+  const `
+  );
+
+  builder.addText(`${resourceName}`, namePosStart, namePosEnd);
+
+  builder.addText(
+    `:string;
   export default ${resourceName};
-}`;
-  return { declarationContent: dec, mapData: [], ...component };
+}`
+  );
+  return {
+    declarationContent: builder.build(),
+    mapData: builder.getMappings(),
+    ...component,
+  };
 }
