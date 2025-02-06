@@ -191,6 +191,7 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
                 const pathInfo =
                   info.project.projectService.getScriptInfo(path);
                 pathInfo?.reloadFromFile();
+                info.project.refreshDiagnostics();
               });
             }
           }

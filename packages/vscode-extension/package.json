@@ -3,7 +3,7 @@
   "private": true,
   "displayName": "Lightning Bolts for LWC",
   "description": "Bolt your LWC components together better",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/aheber/lwc-bolts",
   "author": {
     "name": "Anthony Heber",
@@ -47,6 +47,6 @@
     "eslint": "^8.52.0"
   },
   "dependencies": {
-    "@lwc-bolts/typescript-plugin": "^0.0.3"
+    "@lwc-bolts/typescript-plugin": "^0.0.4"
   }
 }
