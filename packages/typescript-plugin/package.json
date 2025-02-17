@@ -1,13 +1,13 @@
 {
   "name": "@lwc-bolts/typescript-plugin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Typescript language plugin for Lightning Web Components",
   "main": "./dist/",
   "type": "commonjs",
   "scripts": {
     "build": "tsc -p ./",
     "watch": "tsc -w -p ./",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test './tests/**/*.spec.*'"
   },
   "publishConfig": {
     "access": "public"
@@ -24,12 +24,13 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.13.4",
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@salesforce/source-deploy-retrieve": "^12.10.4",
-    "@lwc-bolts/sf2ts": "^0.0.3"
+    "@lwc-bolts/sf2ts": "^0.0.3",
+    "@salesforce/source-deploy-retrieve": "^12.15.0",
+    "lwc": "npm:@lwc/engine-core@^8.13.3"
   },
   "files": [
     "./dist",

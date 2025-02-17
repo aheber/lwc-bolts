@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Account</fullName>
+        <categories>CategoryOne</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Account</shortDescription>
+        <value>Account 123</value>
+    </labels>
+    <labels>
+        <fullName>Australia</fullName>
+        <categories>CategoryOne</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Australia</shortDescription>
+        <value>Australia</value>
+    </labels>
+    <labels>
+        <fullName>Austria</fullName>
+        <categories>CategoryTwo</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Austria</shortDescription>
+        <value>Austria</value>
+    </labels>
+</CustomLabels>

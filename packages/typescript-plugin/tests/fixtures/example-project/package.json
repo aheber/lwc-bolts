@@ -1,0 +1,14 @@
+{
+  "name": "sf-simple-test-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@lwc-bolts/typescript-plugin": "file:../../dist/index.js"
+  }
+}
