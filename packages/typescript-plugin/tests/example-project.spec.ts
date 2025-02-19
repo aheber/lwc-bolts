@@ -3,9 +3,16 @@ import assert from "node:assert/strict";
 import { after, beforeEach, describe, it } from "node:test";
 import { readFile } from "node:fs/promises";
 
-import { getLocationFromFile, getEndPositionFromText } from "./helpers/utils.ts";
+import {
+  getLocationFromFile,
+  getEndPositionFromText,
+} from "./helpers/utils.ts";
 import createServer from "./fixtures/lang-server.ts";
-import { CMD_DEFINITION_AND_BOUND_SPAN, EVT_PROJECT_LOADING_FINISH, EVT_SUGGESTION_DIAG } from "./helpers/lang-server-constants.ts";
+import {
+  CMD_DEFINITION_AND_BOUND_SPAN,
+  EVT_PROJECT_LOADING_FINISH,
+  EVT_SUGGESTION_DIAG,
+} from "./helpers/lang-server-constants.ts";
 
 const testProjectRoot = import.meta.dirname;
 const testProjectPath = path.resolve(
@@ -143,7 +150,9 @@ describe("Definition Resolution", async () => {
 
     server.sendCommand(CMD_DEFINITION_AND_BOUND_SPAN, {
       file,
-      position: fileContent.indexOf("@salesforce/schema/Test_Object__c.Test_Text__c"),
+      position: fileContent.indexOf(
+        "@salesforce/schema/Test_Object__c.Test_Text__c"
+      ),
     });
     const resp2 = await server.waitResponse(CMD_DEFINITION_AND_BOUND_SPAN);
     // linking to the module import means linking to the entire JS file
@@ -280,7 +289,9 @@ describe("Definition Resolution", async () => {
 
     server.sendCommand(CMD_DEFINITION_AND_BOUND_SPAN, {
       file,
-      position: fileContent.indexOf("@salesforce/apexContinuation/File3.startRequest"),
+      position: fileContent.indexOf(
+        "@salesforce/apexContinuation/File3.startRequest"
+      ),
     });
     const resp2 = await server.waitResponse(CMD_DEFINITION_AND_BOUND_SPAN);
     // linking to the module import means linking to the entire JS file
@@ -291,4 +302,3 @@ describe("Definition Resolution", async () => {
 
   // folder with object without fields
 });
-

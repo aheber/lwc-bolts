@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabel>
+    <fullName>Account</fullName>
+    <categories>CategoryOne</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Account</shortDescription>
+    <value>Account 123</value>
+</CustomLabel>

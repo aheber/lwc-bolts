@@ -38,6 +38,7 @@ class TSServer {
     });
     server.stdout?.setEncoding("utf-8");
     server.stdout?.on("data", (data) => {
+      // console.log('Message Received:', data);
       const [, , res] = data.split("\n");
       const obj = JSON.parse(res);
       // console.log(obj);

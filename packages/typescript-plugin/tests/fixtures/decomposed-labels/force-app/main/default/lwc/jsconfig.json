@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "@lwc-bolts/typescript-plugin"
+      }
+    ],
+  }
+}

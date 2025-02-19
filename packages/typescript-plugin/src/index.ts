@@ -2,6 +2,7 @@ import type ts from "typescript/lib/tsserverlibrary.js";
 import {
   ComponentSet,
   MetadataResolver,
+  RegistryAccess,
 } from "@salesforce/source-deploy-retrieve";
 import type { SourceComponent } from "@salesforce/source-deploy-retrieve";
 import { convert, MapPair, MetadataType } from "@lwc-bolts/sf2ts";
@@ -13,12 +14,11 @@ import { convert, MapPair, MetadataType } from "@lwc-bolts/sf2ts";
 let moduleRegistryCache = new Map<string, string[]>();
 let lwcRegistryCache = new Map<string, string[]>();
 let mdtFileCache = new Map<string, ReturnType<typeof convert>>();
+let rslvrCache = new Map<string, MetadataResolver>();
+let regAccessCache = new Map<string, RegistryAccess>();
 
 function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
-  // const modTs = modules.typescript;
-
-  // let the TS server know about all of our "external" modules which are actually Apex
-  // we generate typescript definition files from
+  // let the TS server know about all of our "external" modules that can be imported from Metadata
   function getExternalFiles(
     project: ts.server.Project,
     updateLevel: ts.ProgramUpdateLevel
@@ -38,6 +38,25 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
     return registryCache ?? [];
   }
 
+  function getRegistryAccess(sfdxProjectRoot: string) {
+    let registryAccess = regAccessCache.get(sfdxProjectRoot);
+    if (!registryAccess) {
+      registryAccess = new RegistryAccess(undefined, sfdxProjectRoot);
+      regAccessCache.set(sfdxProjectRoot, registryAccess);
+    }
+    return registryAccess;
+  }
+
+  function getMetadataResolvr(sfdxProjectRoot: string) {
+    const registryAccess = getRegistryAccess(sfdxProjectRoot);
+    let rslvr = rslvrCache.get(sfdxProjectRoot);
+    if (!rslvr) {
+      rslvr = new MetadataResolver(registryAccess);
+      rslvrCache.set(sfdxProjectRoot, rslvr);
+    }
+    return rslvr;
+  }
+
   function buildRegistryCache(
     project: ts.server.Project,
     sfdxProjectRoot: string
@@ -49,86 +68,74 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
     if (!registryCache) {
       registryCache = [];
       moduleRegistryCache.set(sfdxProjectRoot, registryCache);
-      for (let packagePathObj of sfdxProjectContent.packageDirectories) {
-        // use the SDR library to find all of the componenents of our target MDT types
-        // TODO: need to provide a tree instead of it using the NodeFSTree
-        const compSet = ComponentSet.fromSource(
-          sfdxProjectRoot + "/" + packagePathObj.path
-        ).filter(({ type }) => {
-          return [
-            MetadataType.ApexClass,
-            MetadataType.CustomObject,
-            MetadataType.CustomLabels,
-            MetadataType.CustomPermission,
-            MetadataType.StaticResource,
-            MetadataType.ContentAsset,
-            "LightningComponentBundle", // not transformed, only used here in this file
-          ].includes(type.name);
+      let registryAccess = getRegistryAccess(sfdxProjectRoot);
+
+      const compSet = ComponentSet.fromSource({
+        fsPaths: sfdxProjectContent.packageDirectories.map(
+          (d: { path: string; default?: boolean }) =>
+            `${sfdxProjectRoot}/${d.path}`
+        ),
+        registry: registryAccess,
+      }).filter(({ type }) =>
+        [
+          ...Object.keys(MetadataType),
+          "LightningComponentBundle", // not transformed but we still need to grab component types to pre-register them
+        ].includes(type.name)
+      );
+
+      // add to the external module cache
+      registryCache.push(
+        ...compSet
+          .filter(({ type }) => type.name === MetadataType.ApexClass)
+          .toArray()
+          .map((c) => {
+            return (c as unknown as SourceComponent).content ?? "";
+          })
+      );
+
+      // add to the external module cache
+      registryCache.push(
+        ...compSet
+          .filter(({ type }) => MetadataType.hasOwnProperty(type.name))
+          .toArray()
+          .map((c) => {
+            return (c as unknown as SourceComponent).xml ?? "";
+          })
+      );
+
+      const rslvr = getMetadataResolvr(sfdxProjectRoot);
+      // add to the external module cache
+      compSet
+        .filter(({ type }) => ["CustomObject"].includes(type.name))
+        .toArray()
+        .forEach((c) => {
+          if (registryCache) {
+            // find CustomField xml and push into registry cache
+            try {
+              const fields = rslvr
+                .getComponentsFromPath(
+                  `${(c as any).xml.split("/").slice(0, -1).join("/")}/fields/`
+                )
+                .map((c) => c.xml ?? "");
+              registryCache.push(...fields);
+            } catch (err) {
+              console.error(err);
+            }
+          }
         });
 
-        // add to the external module cache
-        registryCache.push(
-          ...compSet
-            .filter(({ type }) => type.name === MetadataType.ApexClass)
-            .toArray()
-            .map((c) => {
-              return (c as unknown as SourceComponent).content ?? "";
-            })
-        );
-
-        // add to the external module cache
-        registryCache.push(
-          ...compSet
-            .filter(({ type }) =>
-              [
-                MetadataType.StaticResource,
-                MetadataType.CustomPermission,
-                MetadataType.CustomLabels,
-                MetadataType.CustomObject,
-                MetadataType.ContentAsset,
-                // @ts-expect-error search for string in array of strings...
-              ].includes(type.name)
-            )
-            .toArray()
-            .map((c) => {
-              return (c as unknown as SourceComponent).xml ?? "";
-            })
-        );
-
-        const rslvr = new MetadataResolver();
-        // add to the external module cache
-        compSet
-          .filter(({ type }) => ["CustomObject"].includes(type.name))
-          .toArray()
-          .forEach((c) => {
-            if (registryCache) {
-              // find CustomField xml and push into registry cache
-              try {
-                const fields = rslvr
-                  .getComponentsFromPath(
-                    `${(c as any).xml.split("/").slice(0, -1).join("/")}/fields/`
-                  )
-                  .map((c) => c.xml ?? "");
-                registryCache.push(...fields);
-              } catch (err) {
-                console.error(err);
-              }
-            }
-          });
-
-        let lwcCache = lwcRegistryCache.get(sfdxProjectRoot);
-        if (!lwcCache) {
-          lwcCache = [];
-          lwcRegistryCache.set(sfdxProjectRoot, lwcCache);
-        }
-
-        lwcCache.push(
-          ...compSet
-            .filter(({ type }) => type.name === "LightningComponentBundle")
-            .toArray()
-            .map((c: any) => `${c.content}/${c.name}.js`)
-        );
+      let lwcCache = lwcRegistryCache.get(sfdxProjectRoot);
+      if (!lwcCache) {
+        lwcCache = [];
+        lwcRegistryCache.set(sfdxProjectRoot, lwcCache);
       }
+
+      lwcCache.push(
+        ...compSet
+          .filter(({ type }) => type.name === "LightningComponentBundle")
+          .toArray()
+          .map((c: any) => `${c.content}/${c.name}.js`)
+      );
     }
   }
 
@@ -153,26 +160,26 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
       "I'm getting set up now! Check the log for this message."
     );
 
+    const rslvr = getMetadataResolvr(sfdxProjectRoot);
+
     const readFile = info.project.projectService.host.readFile;
     info.project.projectService.host.readFile = (
       path: string,
       encoding?: string | undefined
     ) => {
       let mdtType: string = "";
-      if (path.endsWith(".cls")) {
-        mdtType = MetadataType.ApexClass;
-      } else if (path.endsWith(".customPermission-meta.xml")) {
-        mdtType = MetadataType.CustomPermission;
-      } else if (path.endsWith(".resource-meta.xml")) {
-        mdtType = MetadataType.StaticResource;
-      } else if (path.endsWith(".labels-meta.xml")) {
-        mdtType = MetadataType.CustomLabels;
-      } else if (path.endsWith(".object-meta.xml")) {
-        mdtType = MetadataType.CustomObject;
-      } else if (path.endsWith(".field-meta.xml")) {
-        mdtType = MetadataType.CustomField;
-      } else if (path.endsWith(".asset-meta.xml")) {
-        mdtType = MetadataType.ContentAsset;
+      if (path.startsWith(sfdxProjectRoot)) {
+        try {
+          const comps = rslvr.getComponentsFromPath(path);
+          for (let comp of comps) {
+            if (MetadataType.hasOwnProperty(comp.type.name)) {
+              mdtType = comps[0].type.name;
+            }
+          }
+        } catch (error) {
+          // TODO: log error
+          console.error(error);
+        }
       }
       if (mdtType.length > 0) {
         const text = readFile(path);
