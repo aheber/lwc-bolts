@@ -17,7 +17,6 @@ export function CustomLabel(component) {
     }
     labels = result;
   });
-  console.log(labels.CustomLabel);
   const builder = new PositionAwareTextBuilder();
   getDtsFromLabel(builder, component.content, labels.CustomLabel);
   return {
