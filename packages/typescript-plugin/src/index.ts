@@ -111,15 +111,12 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
         .forEach((c) => {
           if (registryCache) {
             // find CustomField xml and push into registry cache
-            try {
+            const fieldsPath = `${(c as any).xml.split("/").slice(0, -1).join("/")}/fields/`;
+            if (project.projectService.host.directoryExists(fieldsPath)) {
               const fields = rslvr
-                .getComponentsFromPath(
-                  `${(c as any).xml.split("/").slice(0, -1).join("/")}/fields/`
-                )
+                .getComponentsFromPath(fieldsPath)
                 .map((c) => c.xml ?? "");
               registryCache.push(...fields);
-            } catch (err) {
-              console.error(err);
             }
           }
         });
@@ -260,10 +257,6 @@ function init(modules: { typescript: typeof ts }): ts.server.PluginModule {
         fileName,
         position
       );
-
-      // TODO: handle more data types like Custom Labels, Custom Permissions, etc...
-
-      // find any
 
       output?.definitions
         ?.filter((def) => mdtFileCache.has(def.fileName))

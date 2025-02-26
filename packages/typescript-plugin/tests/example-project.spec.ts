@@ -300,5 +300,5 @@ describe("Definition Resolution", async () => {
 
   // auto-completion suggestion for partial text ( another file )
 
-  // folder with object without fields
+  // Test_Object_2__c exists just to ensure we check for `/fields` before trying to read it
 });
