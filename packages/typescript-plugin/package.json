@@ -1,6 +1,6 @@
 {
   "name": "@lwc-bolts/typescript-plugin",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Typescript language plugin for Lightning Web Components",
   "main": "./dist/",
   "type": "commonjs",
