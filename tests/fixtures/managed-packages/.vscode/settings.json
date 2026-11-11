@@ -1,0 +1,10 @@
+{
+  "xml.preferences.showSchemaDocumentationType": "none",
+  // Use TypeScript 7 (requires the "TypeScript 7" extension, TypeScriptTeam.native-preview)...
+  "js/ts.experimental.useTsgo": true,
+  // ...running the 7.1 beta installed at the root of the lwc-bolts repo, which supports content mappers.
+  // Opt in once with "TypeScript: Select TypeScript Version..." > "Use Workspace Version".
+  "js/ts.tsdk.path": "../../../node_modules/typescript",
+  // Content mappers also require a trusted workspace.
+  "js/ts.contentMappers.enabled": true
+}

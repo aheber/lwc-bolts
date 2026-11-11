@@ -1,0 +1,853 @@
+{
+  // Manual changes to the lightning-* base components, applied after importing them from the LWC language
+  // server and the sfdx-lwc-jest stubs (see lightning/sources.json), and winning over both:
+  //
+  // - null removes a component, property, method or event, and keeps it removed when the sources change.
+  // - "type" and "description" replace a member's imported ones, or add a member neither source has.
+  //   An event's "detail" is shorthand for CustomEvent<detail>. Neither source has events.
+  // - A component neither source has is added; "replace": true ignores a component's imported members.
+  //
+  // Run `npm run generate` after changing it.
+  //
+  // Events, method argument types and lightning-select, -empty-state and -illustration come from the
+  // Lightning Component Reference (developer.salesforce.com/docs/platform/lightning-component-reference),
+  // corrected where it disagrees with how the components behave (see the comments below). Descriptions
+  // are the reference's, verbatim. `npm run compare-docs` lists where the definitions and the
+  // reference still differ.
+  "$schema": "./overrides.schema.json",
+  "components": {
+    "lightning-accordion": {
+      "events": {
+        "sectiontoggle": {
+          "detail": "{ openSections: any }",
+          "description": "The event that's fired when an accordion loads with at least one active section or when a section is toggled. Doesn't bubble.",
+        },
+      },
+    },
+    "lightning-accordion-section": {
+      // slots, which the language server lists as attributes
+      "properties": {
+        "actions": null,
+      },
+    },
+    "lightning-button-menu": {
+      "events": {
+        "select": {
+          "detail": "{ value: string }",
+          "description": "The event fired when the menu is selected. Doesn't bubble.",
+        },
+        "open": {
+          "detail": "any",
+          "description": "The event fired when you open the dropdown menu in one of the following ways. Doesn't bubble.",
+        },
+        "close": {
+          "detail": "any",
+          "description": "The event fired when you close the dropdown menu in one of the following ways. Doesn't bubble.",
+        },
+      },
+      // slots, which the language server lists as attributes
+      "properties": {
+        "body": null,
+      },
+    },
+    "lightning-card": {
+      // slots, which the language server lists as attributes
+      "properties": {
+        "actions": null,
+        "footer": null,
+      },
+    },
+    "lightning-checkbox-group": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns the valid attribute value (Boolean) on the ValidityState object.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when the checkbox value is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Displays an error message if the checkbox value is required and no option is selected.",
+        },
+      },
+      "events": {
+        "change": {
+          "detail": "{ value: string[] }",
+          "description": "The checked options changed.",
+        },
+      },
+    },
+    "lightning-combobox": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns the valid attribute value (Boolean) on the ValidityState object.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when the combobox value is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Shows the help message if the combobox is in an invalid state.",
+        },
+      },
+      "events": {
+        // the reference names the parameter selectedValue, but the detail is { value }
+        "change": {
+          "detail": "{ value: string }",
+          "description": "The event fired when an item is selected in the combobox. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+        "open": {
+          "detail": "any",
+          "description": "The event fired when the dropdown is opened. Doesn't bubble.",
+        },
+      },
+    },
+    "lightning-datatable": {
+      "events": {
+        "rowselection": {
+          "detail": "{ selectedRows: any[]; config?: { action?: string; value?: any } }",
+          "description": "The event fired when the row is selected. Doesn't bubble.",
+        },
+        "rowaction": {
+          "detail": "{ action: any; row: any }",
+          "description": "A row action was clicked.",
+        },
+        "save": {
+          "detail": "{ draftValues: any[] }",
+          "description": "The event fired when data is saved during inline editing. Doesn't bubble.",
+        },
+        "cellchange": {
+          "detail": "{ draftValues: any[] }",
+          "description": "An inline edit changed a cell.",
+        },
+        "sort": {
+          "detail": "{ fieldName: string; sortDirection: \"asc\" | \"desc\"; isMultiColumnSort?: boolean }",
+          "description": "The event fired when a column is sorted. Doesn't bubble.",
+        },
+        "cancel": {
+          "detail": "any",
+          "description": "The event fired when the cancel button is pressed during inline editing. Doesn't bubble.",
+        },
+        "headeraction": {
+          "detail": "{ action: any; columnDefinition: any }",
+          "description": "The event fired when a header action is selected, such as text wrapping, text clipping, or a custom header action. Doesn't bubble.",
+        },
+        "loadmore": {
+          "detail": "{ enableInfiniteLoading: boolean; isLoading: boolean; loadMoreOffset: number }",
+          "description": "The event fired when you scroll to the bottom of the table to load more data, until there are no more data to load. Doesn't bubble.",
+        },
+        "resize": {
+          "detail": "{ columnWidths: any; isUserTriggered: boolean }",
+          "description": "The event fired when the a table column is resized, which depends on which width mode you're using. Doesn't bubble.",
+        },
+      },
+      "methods": {
+        "getSelectedRows": {
+          "description": "Returns data in each selected row.",
+        },
+        "openInlineEdit": {
+          "description": "Opens the inline edit panel for the datatable's currently active cell. If the active cell is not editable, then the panel is instead opened for the first editable cell in the table. Given two distinct cells, C_x and C_y, C_x is considered \"first\" in the cell ordering if the following condition evaluates to true: (C_x.rowIndex < C_y.rowIndex) || (C_x.rowIndex === C_y.rowIndex && C_x.columnIndex < C_y.columnIndex) If there is no data in the table or there are no editable cells in the table then calling this function results in a no-op.",
+        },
+        "scrollToTop": {
+          "type": "() => any",
+          "description": "Scrolls to the top of the datatable.",
+        },
+      },
+    },
+    "lightning-dual-listbox": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns the valid attribute value (Boolean) on the ValidityState object.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when the dual listbox value is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Displays an error message if the dual listbox value is required.",
+        },
+      },
+      "events": {
+        // the reference types value as a string, but a dual listbox selects several
+        "change": {
+          "detail": "{ value: string[] }",
+          "description": "The event fired when an item is selected in the combobox. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+      },
+    },
+    "lightning-empty-state": {
+      "description": "Presents information to help users understand why a panel or other container has no content.",
+      "properties": {
+        "alternativeText": {
+          "type": "string | number",
+          "description": "Assistive text that describes the illustration. Provide this text for assistive devices if the description and title aren't meaningful enough by themselves.",
+        },
+        "headingLevel": {
+          "type": "string | number",
+          "description": "Sets the aria-level value for the <h3> element in the empty state's title element. Specify headingLevel if the implicit value 3 isn't correct for your use case. Supported values are 1, 2, 3, 4, 5, 6.",
+        },
+        "illustrationName": {
+          "type": "string | number",
+          "description": "The illustration identifier in \"set:symbol\" format. See the Develop tab for valid illustration names.",
+        },
+        "size": {
+          "type": "string | number",
+          "description": "Overrides the automatic illustration sizing. Valid values are x-small, small, medium. The default value is null, which triggers the automatic sizing.",
+        },
+        "title": {
+          "type": "string | number",
+          "description": "Text to display as the title in an <h3> element in the component.",
+        },
+      },
+    },
+    "lightning-file-upload": {
+      "methods": {
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when a form is submitted.",
+        },
+      },
+      "events": {
+        "uploadfinished": {
+          "detail": "{ files: any[] }",
+          "description": "The event fired when files are uploaded successfully. Doesn't bubble.",
+        },
+      },
+    },
+    "lightning-flow": {
+      "methods": {
+        "startFlow": {
+          "type": "(flowApiName: string, flowInputVariables?: any[]) => void",
+          "description": "Starts a flow interview.",
+        },
+        "resumeFlow": {
+          "type": "(flowInterviewId: string) => void",
+          "description": "Call this method with a `flowInterviewId` to resume an existing paused interview",
+        },
+      },
+    },
+    "lightning-illustration": {
+      "description": "Displays a Salesforce Lightning Design System illustration.",
+      "properties": {
+        "alternativeText": {
+          "type": "string | number",
+          "description": "Assistive text that describes the illustration. Provide this text for assistive devices if the meaning of the surrounding content isn't sufficient.",
+        },
+        "illustrationName": {
+          "type": "string | number",
+          "description": "The illustration identifier in \"set:symbol\" format. See the Develop tab for valid illustration names.",
+        },
+      },
+    },
+    "lightning-input": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Checks if the input is valid.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when a form is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Displays error messages on invalid fields. An invalid field fails at least one constraint validation and returns false when checkValidity() is called.",
+        },
+      },
+      "events": {
+        // the reference only lists value; checkboxes and toggles also report detail.checked
+        "change": {
+          "detail": "{ value: any; checked?: boolean }",
+          "description": "The event fired when a value is changed in the input field. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+        "commit": {
+          "detail": "any",
+          "description": "The event fired when you press Enter after interacting with the input, or move away from the input so it loses focus. For the input type search, the event is fired when focus leaves the entire component or when the user clicks the X button to clear the search. The event is also fired when you press the Enter key. For the input type `number` the event is also fired when you press Up/Down arrow keys to change the number. Doesn't bubble.",
+        },
+      },
+    },
+    "lightning-input-address": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns whether the component's value is valid, without showing an error.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Returns whether the component's value is valid, and shows its error message when it isn't.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Shows the component's error message when its value is invalid.",
+        },
+      },
+    },
+    "lightning-input-field": {
+      "methods": {
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Reserved for internal use.",
+        },
+        "clean": {
+          "description": "Reserved for internal use. Clean up the field dirty state.",
+        },
+        "reset": {
+          "description": "Resets the form fields to their initial values.",
+        },
+        "setErrors": {
+          "description": "Reserved for internal use.",
+        },
+        "updateDependentField": {
+          "description": "Reserved for internal use.",
+        },
+        "wirePicklistValues": {
+          "description": "Reserved for internal use.",
+        },
+        "wireRecordUi": {
+          "description": "Reserved for internal use.",
+        },
+      },
+    },
+    "lightning-input-location": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns whether the component's value is valid, without showing an error.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Returns whether the component's value is valid, and shows its error message when it isn't.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Shows the component's error message when its value is invalid.",
+        },
+      },
+    },
+    "lightning-input-name": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns whether the component's value is valid, without showing an error.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Returns whether the component's value is valid, and shows its error message when it isn't.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Shows the component's error message when its value is invalid.",
+        },
+      },
+    },
+    "lightning-input-rich-text": {
+      "events": {
+        "imageupload": {
+          "detail": "{ imageId: string; downloadUrl: string; file: File; contentVersionId: string }",
+          "description": "The event fired when each image uploads successfully. Doesn't bubble.",
+        },
+        "imageuploaderror": {
+          "detail": "{ error: string; file: File; imageId: string; maxSize: number; reason: string }",
+          "description": "The event fired when an image fails to be inserted into the rich text editor or uploaded. Doesn't bubble.",
+        },
+      },
+      "methods": {
+        "insertTextAtCursor": {
+          "type": "(text: string) => void",
+          "description": "Reserved for internal use. Insert text in the rich text editor at cursor position.",
+        },
+        "setFormat": {
+          "type": "(formats: any) => void",
+          "description": "Sets a format in the editor from the cursor point onwards. The format also applies to currently selected content. Valid formats are font, size, and align.",
+        },
+        "setRangeText": {
+          "type": "(replacement: string, start?: number, end?: number, selectMode?: string) => void",
+          "description": "Replaces a range of text in the rich text editor with a new string",
+        },
+        "getFormat": {
+          "description": "Returns an object representing the formats applied to the current selection. Formats supported are align, background, bold, code, code-block, color, font, header, italic, link, size, strike, underline.",
+        },
+        "uploadPendingImages": {
+          "type": "() => any",
+          "description": "Uploads all pending images that were inserted while manualImageUpload was true. Returns a promise that resolves with an array of upload results.",
+        },
+      },
+    },
+    "lightning-layout": {
+      // slots, which the language server lists as attributes
+      "properties": {
+        "body": null,
+      },
+    },
+    "lightning-layout-item": {
+      // slots, which the language server lists as attributes
+      "properties": {
+        "body": null,
+      },
+    },
+    "lightning-map": {
+      "events": {
+        "markerselect": {
+          "detail": "{ selectedMarkerValue: string }",
+          "description": "The event fired when a marker is selected. Select a marker by clicking it on the map or in the list of locations. The value of the selected marker is available on the `selected-marker-value` attribute on the component. Bubbles, but doesn't cross the component's shadow boundary.",
+        },
+      },
+    },
+    "lightning-output-field": {
+      "methods": {
+        "wirePicklistValues": {
+          "description": "Reserved for internal use.",
+        },
+        "wireRecordUi": {
+          "description": "Reserved for internal use.",
+        },
+      },
+    },
+    "lightning-pill": {
+      "events": {
+        "remove": {
+          "detail": "{ name: string }",
+          "description": "The first event fired when you click the remove button. Doesn't bubble.",
+        },
+      },
+      "methods": {
+        "focusLink": {
+          "description": "Reserved for internal use. Sets focus on the anchor element for a plainLink pill.",
+        },
+        "focusRemove": {
+          "type": "() => any",
+          "description": "Reserved for internal use. Sets focus on the remove button element for a plain pill.",
+        },
+      },
+      // slots, which the language server lists as attributes
+      "properties": {
+        "media": null,
+      },
+    },
+    "lightning-pill-container": {
+      "events": {
+        "itemremove": {
+          "detail": "{ item: any; index: number }",
+          "description": "The event fired when a pill is removed. Doesn't bubble.",
+        },
+      },
+    },
+    "lightning-progress-step": {
+      "events": {
+        "stepblur": {
+          "detail": "{ index: number | string }",
+          "description": "The event fired when a step releases focus. Bubbles, but doesn't cross the component's shadow boundary.",
+        },
+        "stepfocus": {
+          "detail": "{ index: number | string }",
+          "description": "The event fired when a step receives focus. Bubbles, but doesn't cross the component's shadow boundary.",
+        },
+        "stepmouseenter": {
+          "detail": "{ index: number | string }",
+          "description": "The event fired when the mouse pointer moves onto the step. Bubbles, but doesn't cross the component's shadow boundary.",
+        },
+        "stepmouseleave": {
+          "detail": "{ index: number | string }",
+          "description": "The event fired when the mouse pointer moves off the step. Bubbles, but doesn't cross the component's shadow boundary.",
+        },
+      },
+    },
+    "lightning-radio-group": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns the valid attribute value (Boolean) on the ValidityState object.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when the radio group value is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Shows the help message if the form control is in an invalid state.",
+        },
+      },
+      "events": {
+        "change": {
+          "detail": "{ value: string }",
+          "description": "The selected option changed.",
+        },
+      },
+    },
+    "lightning-record-edit-form": {
+      "events": {
+        "submit": {
+          "detail": "{ fields: Record<string, any> }",
+          "description": "The event fired when the submit button is pressed. Client-side validation errors, if any, are displayed. The form is then submitted only when all fields in the form are valid. The form can be submitted only after it's loaded. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+        // the reference lists no parameters, but the detail is the saved record
+        "success": {
+          "detail": "{ id: string; [key: string]: any }",
+          "description": "The event fired when the record data is updated successfully. The `load` event then fires to return the updated data. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+        "error": {
+          "detail": "{ message?: string; detail?: any; output?: any }",
+          "description": "The event fired when the record edit form returns a server-side error. Doesn't bubble.",
+        },
+        "load": {
+          "detail": "any",
+          "description": "The event fired when the record edit form loads record data. If you load the fields dynamically, `load` is fired before the child elements of `lightning-record-edit-form` finish loading. Consider the [`connectedCallback()` lifecycle](https://developer.salesforce.com/docs/platform/lwc/guide/create-lifecycle-hooks-dom) hook to perform initialization tasks. Alternatively, to load values or set properties dynamically, use a [getter and setter](https://developer.salesforce.com/docs/platform/lwc/guide/js-props-getters-setters) instead. Doesn't bubble.",
+        },
+      },
+      "methods": {
+        // the reference types fields as string[] | FieldId[], but submit takes field values
+        "submit": {
+          "type": "(fields?: Record<string, any>) => void",
+          "description": "Submits the form using an array of record fields or field IDs. The field ID is provisioned from @salesforce/schema/. Invoke this method only after the load event.",
+        },
+      },
+    },
+    "lightning-record-form": {
+      "events": {
+        "cancel": {
+          "detail": "any",
+          "description": "The event fired when the user clicks the Cancel button. If the form includes the `recordId` attribute, pressing the Cancel button returns the user to view mode with initial values provided by the record. If you don't provide the `recordId` attribute, pressing the Cancel button resets the fields to blank values. Doesn't bubble.",
+        },
+      },
+      "methods": {
+        // the reference types fields as string[] | FieldId[], but submit takes field values
+        "submit": {
+          "type": "(fields?: Record<string, any>) => void",
+          "description": "Submits the form using an array of record fields or field IDs. The field ID is provisioned from @salesforce/schema/. Invoke this method only after the load event.",
+        },
+      },
+    },
+    "lightning-record-picker": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Check if the component is in a valid state.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Check if the component is in a valid state and refresh the validity message. If the component is valid, it clears the validity error message. If the component is invalid, it displays the validity error message.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Set a custom validity error message.",
+        },
+        "clearSelection": {
+          "description": "Clears the selected record. This method does not clear the search term or refresh the validity message.",
+        },
+      },
+    },
+    "lightning-record-view-form": {
+      "events": {
+        "load": {
+          "detail": "any",
+          "description": "The event fired when the record view form loads record data. If you load the fields dynamically, `load` is fired before the child elements of `lightning-record-view-form` finish loading. Consider the [`connectedCallback()` lifecycle](https://developer.salesforce.com/docs/platform/lwc/guide/create-lifecycle-hooks-dom) hook to perform initialization tasks. Alternatively, to load values or set properties dynamically, use a [getter and setter](https://developer.salesforce.com/docs/platform/lwc/guide/js-props-getters-setters) instead. Doesn't bubble.",
+        },
+      },
+    },
+    "lightning-rich-text-toolbar-button": {
+      "events": {
+        "popupclickout": {
+          "detail": "any",
+          "description": "The event fired when a popup is open and you click outside it. Doesn't bubble.",
+        },
+      },
+      "methods": {
+        "closePopup": {
+          "description": "Closes the popup that was displayed below the button.",
+        },
+        "showPopup": {
+          "description": "Displays a popup below the button. Items passed in to the default slot of this component are rendered as the content of the popup.",
+        },
+      },
+    },
+    "lightning-select": {
+      "events": {
+        "change": {
+          "detail": "{ value: string | string[] }",
+          "description": "The event fired when an option is selected. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+      },
+      "description": "A menu of options for single or multiple selection.",
+      "properties": {
+        "accessKey": {
+          "type": "string | number",
+          "description": "A shortcut key that activates and focuses on the menu.",
+        },
+        "ariaDescribedBy": {
+          "type": "string | number",
+          "description": "Aria Described by value on parent lighting-select",
+        },
+        "ariaLabelledBy": {
+          "type": "string | number",
+          "description": "A space-separated list of element IDs that provide labels for the aria-labelled-by value on parent lighting-select.",
+        },
+        "autocomplete": {
+          "type": "string | number",
+          "description": "Reserved for internal use. Controls auto-filling of the field.",
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "Specifies whether the menu is disabled and users cannot interact with it.",
+        },
+        "fieldLevelHelp": {
+          "type": "string | number",
+          "description": "Help text detailing the purpose and function of the menu of options. The text is displayed in a tooltip above the menu.",
+        },
+        "label": {
+          "type": "string | number",
+          "description": "The text label for the component. To hide the label but make it available to assistive technologies, use the label-hidden variant.",
+        },
+        "messageWhenValueMissing": {
+          "type": "string | number",
+          "description": "The error message that's displayed below the menu when a user interacts with the menu but does not select an option.",
+        },
+        "multiple": {
+          "type": "boolean",
+          "description": "Specifies whether multiple options can be selected.",
+        },
+        "name": {
+          "type": "string | number",
+          "description": "The identifier for the component.",
+        },
+        "options": {
+          "type": "readonly { label: string; value: string }[]",
+          "description": "An array of menu options with key-value pairs for label and value.",
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Specifies whether an option must be selected.",
+        },
+        "size": {
+          "type": "number | string | null",
+          "description": "The number of rows in the list that should be visible at one time. Use this attribute with the multiple attribute.",
+        },
+        "validity": {
+          "type": "ValidityState",
+          "description": "Represents the validity states that an element can be in, with respect to constraint validation.",
+        },
+        "value": {
+          "type": "any",
+          "description": "The value of the selected option. If empty and a value is required, the component is in an invalid state.",
+        },
+        "variant": {
+          "type": "string | number",
+          "description": "The variant changes the appearance of the dropdown menu. Accepted variants include standard, label-inline, label-hidden, and label-stacked. This value defaults to standard, which displays the label above the dropdown menu. label-hidden hides the label but make it available to assistive technology. label-inline horizontally aligns the label and dropdown menu. label-stacked places the label above the dropdown menu.",
+        },
+      },
+      "methods": {
+        "blur": {
+          "type": "() => void",
+        },
+        "focus": {
+          "type": "() => void",
+        },
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Checks if the input is valid.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when a form is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Displays an error message on an invalid select field. An invalid field fails at least one constraint validation and returns false when checkValidity() is called.",
+        },
+      },
+    },
+    "lightning-slider": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns the valid attribute value (Boolean) on the ValidityState object.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when the slider value is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Displays error messages on invalid fields. An invalid field fails at least one constraint validation and returns false when checkValidity() is called.",
+        },
+      },
+      "events": {
+        "change": {
+          "detail": "{ value: number }",
+          "description": "The value changed.",
+        },
+      },
+    },
+    "lightning-tab": {
+      "events": {
+        "active": {
+          "detail": "any",
+          "description": "The event fired when a tab becomes active. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+      },
+      "methods": {
+        "loadContent": {
+          "description": "Reserved for internal use.",
+        },
+      },
+      // slots, which the language server lists as attributes
+      "properties": {
+        "body": null,
+      },
+    },
+    "lightning-tabset": {
+      // slots, which the language server lists as attributes
+      "properties": {
+        "body": null,
+      },
+    },
+    "lightning-textarea": {
+      "methods": {
+        "checkValidity": {
+          "type": "() => boolean",
+          "description": "Returns the valid attribute value (Boolean) on the ValidityState object.",
+        },
+        "reportValidity": {
+          "type": "() => boolean",
+          "description": "Displays the error messages and returns false if the input is invalid. If the input is valid, reportValidity() clears displayed error messages and returns true.",
+        },
+        "setCustomValidity": {
+          "type": "(message: string) => void",
+          "description": "Sets a custom error message to be displayed when the textarea value is submitted.",
+        },
+        "showHelpMessageIfInvalid": {
+          "type": "() => void",
+          "description": "Displays error messages on invalid fields. An invalid field fails at least one constraint validation and returns false when checkValidity() is called.",
+        },
+        "setRangeText": {
+          "type": "(replacement: string, start?: number, end?: number, selectMode?: string) => void",
+          "description": "Replace a range of text in textarea with a new string.",
+        },
+      },
+      "events": {
+        "change": {
+          "detail": "{ value: string }",
+          "description": "The value changed.",
+        },
+      },
+    },
+    "lightning-tile": {
+      "events": {
+        "actiontriggered": {
+          "detail": "{ action: any }",
+          "description": "The event fired when an action on the dropdown menu is triggered. Doesn't bubble.",
+        },
+      },
+      // slots, which the language server lists as attributes
+      "properties": {
+        "media": null,
+      },
+    },
+    "lightning-toast-container": {
+      "methods": {
+        "close": {
+          "description": "Overrides the \"close\" function of the toast container.",
+        },
+      },
+    },
+    "lightning-tree": {
+      "events": {
+        "select": {
+          "detail": "{ name: string }",
+          "description": "The event fired when a tree item is selected and before navigating to a given hyperlink. Bubbles, and crosses the component's shadow boundary (composed).",
+        },
+      },
+    },
+    "lightning-tree-grid": {
+      "events": {
+        "toggle": {
+          "detail": "{ name: string; isExpanded: boolean; hasChildrenContent: boolean; row: any }",
+          "description": "The event fired when a row is expanded or collapsed. Doesn't bubble.",
+        },
+        "toggleall": {
+          "detail": "{ isExpanded: boolean }",
+          "description": "The event fired when all rows are expanded or collapsed. Doesn't bubble.",
+        },
+        "sort": {
+          "detail": "{ fieldName: string; sortDirection: \"asc\" | \"desc\"; isMultiColumnSort?: boolean }",
+          "description": "The event fired when a column is sorted. Doesn't bubble.",
+        },
+        "rowselection": {
+          "detail": "any",
+          "description": "The event fired when a row is selected. Doesn't bubble.",
+        },
+        "headeraction": {
+          "detail": "any",
+          "description": "The event fired when a header-level action is run. Doesn't bubble.",
+        },
+        "rowaction": {
+          "detail": "any",
+          "description": "The event fired when a row-level action is run. Doesn't bubble.",
+        },
+      },
+      "methods": {
+        "collapseAll": {
+          "description": "Collapse all rows",
+        },
+        "expandAll": {
+          "description": "Expand all rows with children content",
+        },
+        "getCurrentExpandedRows": {
+          "description": "Returns an array of rows that are expanded.",
+        },
+        "getSelectedRows": {
+          "description": "Returns data in each selected row.",
+        },
+      },
+    },
+    "lightning-vertical-navigation": {
+      "events": {
+        "beforeselect": {
+          "detail": "{ name: string }",
+          "description": "The event fired before a navigation item is selected. Doesn't bubble.",
+        },
+        "select": {
+          "detail": "{ name: string }",
+          "description": "The event fired when a navigation item is selected. Doesn't bubble.",
+        },
+      },
+    },
+  },
+}

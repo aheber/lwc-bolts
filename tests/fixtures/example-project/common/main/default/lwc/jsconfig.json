@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../../../force-app/main/default/lwc/jsconfig.json"
+    }
+  ],
+  "compilerOptions": {
+  },
+  "typeAcquisition": {
+    "include": [
+      "jest"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "@salesforce/lwc-language-server": "4.12.13",
+  "@salesforce/sfdx-lwc-jest": "7.9.0"
+}

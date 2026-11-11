@@ -1,0 +1,23 @@
+exports[`Convert:CustomLabel > Generate declaration from custom label 1`] = `
+declare module "@salesforce/label/c.Account" {
+  /**
+   * "Label Value"
+   *
+   * @description Account Description
+   */
+  const lblAccount: string;
+  export default lblAccount;
+}
+
+`;
+
+exports[`Convert:CustomLabel > Omits a missing description 1`] = `
+declare module "@salesforce/label/c.NoDesc" {
+  /**
+   * "x"
+   */
+  const lblNoDesc: string;
+  export default lblNoDesc;
+}
+
+`;

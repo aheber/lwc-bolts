@@ -1,0 +1,15 @@
+exports[`Convert:ContentAsset > Generate declaration from content asset 1`] = `
+declare module "@salesforce/contentAssetUrl/Image9" {
+  const Image9: string;
+  export default Image9;
+}
+
+`;
+
+exports[`Convert:ContentAsset > Names the module after the asset's developer name, not its label 1`] = `
+declare module "@salesforce/contentAssetUrl/companyLogo" {
+  const companyLogo: string;
+  export default companyLogo;
+}
+
+`;

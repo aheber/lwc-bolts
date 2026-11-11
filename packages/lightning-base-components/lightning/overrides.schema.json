@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lightning base component overrides",
+  "description": "Manual changes to the lightning-* base components' definitions, applied after importing them from the LWC language server and the sfdx-lwc-jest stubs, and winning over both.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "components": {
+      "type": "object",
+      "propertyNames": { "pattern": "^lightning-[a-z0-9]+(-[a-z0-9]+)*$" },
+      "additionalProperties": {
+        "description": "A component to change or add, or null to remove it and keep it removed.",
+        "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/component" }]
+      }
+    }
+  },
+  "definitions": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string" },
+        "replace": {
+          "type": "boolean",
+          "description": "Ignore the imported members, so the component has only the members given here."
+        },
+        "properties": { "$ref": "#/definitions/members" },
+        "methods": { "$ref": "#/definitions/members" },
+        "events": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+          "additionalProperties": {
+            "description": "An event, as `on<name>` handles it, or null to remove it and keep it removed.",
+            "oneOf": [
+              { "type": "null" },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "type": "string", "description": "The event's type, such as CustomEvent<{ value: string }>." },
+                  "detail": { "type": "string", "description": "Shorthand for CustomEvent<detail>: the type of the event's detail." },
+                  "description": { "type": "string" }
+                },
+                "not": { "required": ["type", "detail"] }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "members": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$" },
+      "additionalProperties": {
+        "description": "A member to change or add, or null to remove it and keep it removed.",
+        "oneOf": [
+          { "type": "null" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": { "type": "string", "description": "A TypeScript type, such as string or () => boolean." },
+              "description": { "type": "string" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

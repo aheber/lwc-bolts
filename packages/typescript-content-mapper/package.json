@@ -1,0 +1,57 @@
+{
+  "name": "@lwc-bolts/typescript-content-mapper",
+  "version": "1.0.0",
+  "description": "TypeScript content mapper that exposes Salesforce metadata (Apex, labels, schema, static resources, ...) as importable LWC modules",
+  "type": "module",
+  "exports": {
+    "./options": {
+      "@lwc-bolts/source": "./src/options.ts",
+      "types": "./dist/options.d.ts",
+      "default": "./dist/options.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --conditions=@lwc-bolts/source --test 'test/**/*.test.ts'"
+  },
+  "typescript": {
+    "contentMapper": {
+      "exec": [
+        "node",
+        "./dist/server.js"
+      ],
+      "dynamicConfig": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@lwc-bolts/sf2ts": "^1.0.0",
+    "@lwc-bolts/sfdx-project": "^1.0.0"
+  },
+  "devDependencies": {
+    "@lwc-bolts/lightning-base-components": "^1.0.0",
+    "@lwc-bolts/project-setup": "^1.0.0",
+    "@types/node": "^22.20.5",
+    "jsonc-parser": "^3.3.1",
+    "typescript": "7.1.0-beta"
+  }
+}

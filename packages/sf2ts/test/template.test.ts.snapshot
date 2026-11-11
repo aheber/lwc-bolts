@@ -1,0 +1,37 @@
+exports[`templates > lwc:ref > types this.refs in the component from the template's refs 1`] = `
+declare module "./orders.js" {
+  export default interface __LwcTemplate {
+    refs: { [K in keyof __LwcRefs]: __LwcRefs[K] } | undefined;
+  }
+  export interface __LwcRefs {
+    search: __lwcElement<"input">;
+    card: HTMLElement & InstanceType<__lwcComponent0>;
+    field: HTMLElement & __lwcLightning0 & __lwcLightning0Methods;
+    approve?: __lwcElement<"button">;
+  }
+}
+
+`;
+
+exports[`templates > mapping and scoping > scopes nested loops, including one that shadows its parent's variable 1`] = `
+for (const item of $cmp.items ?? []) {
+  void item;
+  const i = 0 as number; void i;
+  item.id;
+  for (const __lwcItem0 of item.children ?? []) {
+    const item = __lwcItem0; void item;
+    item.id;
+    item.name;
+    i;
+  }
+  for (const __lwcItem1 of item.children ?? []) {
+    const it = { value: __lwcItem1, index: 0 as number, first: false as boolean, last: false as boolean }; void it;
+    it.value.id;
+    it.first;
+    it.index;
+  }
+}
+$cmp.item;
+$cmp.it;
+
+`;

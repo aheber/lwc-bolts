@@ -1,0 +1,22 @@
+exports[`Convert:StaticResource > Generate declaration from static resource 1`] = `
+declare module "@salesforce/resourceUrl/TextRaw" {
+  /**
+   * @description Logo for the the package
+   * @cacheControl Private
+   */
+  const TextRaw: string;
+  export default TextRaw;
+}
+
+`;
+
+exports[`Convert:StaticResource > Maps the declaration to the root element without a description 1`] = `
+declare module "@salesforce/resourceUrl/lib" {
+  /**
+   * @cacheControl Public
+   */
+  const lib: string;
+  export default lib;
+}
+
+`;

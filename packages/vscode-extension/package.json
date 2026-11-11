@@ -1,9 +1,10 @@
 {
   "name": "lwc-bolts-vscode",
   "private": true,
-  "displayName": "Lightning Bolts for LWC",
-  "description": "Bolt your LWC components together better",
-  "version": "0.0.6",
+  "type": "module",
+  "displayName": "%displayName%",
+  "description": "%description%",
+  "version": "1.0.0",
   "repository": "https://github.com/aheber/lwc-bolts",
   "icon": "assets/logo.png",
   "author": {
@@ -13,7 +14,7 @@
   },
   "publisher": "aheber",
   "engines": {
-    "vscode": "^1.84.0"
+    "vscode": "^1.126.0"
   },
   "categories": [
     "Other"
@@ -22,34 +23,156 @@
     "workspaceContains:sfdx-project.json"
   ],
   "main": "./dist/extension.js",
+  "l10n": "./l10n",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "%capabilities.untrustedWorkspaces.description%"
+    }
+  },
   "contributes": {
-    "typescriptServerPlugins": [
+    "commands": [
       {
-        "name": "@lwc-bolts/typescript-plugin",
-        "enableForWorkspaceTypeScriptVersions": true
+        "command": "lwcBolts.setUpProject",
+        "title": "%command.setUpProject.title%",
+        "category": "%command.category%"
+      },
+      {
+        "command": "lwcBolts.checkSetup",
+        "title": "%command.checkSetup.title%",
+        "category": "%command.category%"
+      },
+      {
+        "command": "lwcBolts.applySettingsToProject",
+        "title": "%command.applySettingsToProject.title%",
+        "category": "%command.category%"
       }
-    ]
+    ],
+    "taskDefinitions": [
+      {
+        "type": "lwcBolts",
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "type": "string",
+            "enum": [
+              "install"
+            ],
+            "description": "%taskDefinition.lwcBolts.task.description%"
+          }
+        }
+      }
+    ],
+    "configuration": {
+      "title": "%configuration.title%",
+      "properties": {
+        "lwcBolts.maintainLwcConfigs": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%configuration.maintainLwcConfigs.markdownDescription%"
+        },
+        "lwcBolts.contentMapper.apexNamespace": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": "Apex",
+          "pattern": "^[A-Za-z_$][\\w$]*(\\.[A-Za-z_$][\\w$]*)*$",
+          "patternErrorMessage": "%configuration.contentMapper.apexNamespace.patternErrorMessage%",
+          "markdownDescription": "%configuration.contentMapper.apexNamespace.markdownDescription%"
+        },
+        "lwcBolts.contentMapper.inaccessibleApexProperties": {
+          "type": "string",
+          "enum": [
+            "include as deprecated",
+            "include",
+            "exclude"
+          ],
+          "enumDescriptions": [
+            "%configuration.contentMapper.inaccessibleApexProperties.enumDescriptions.0%",
+            "%configuration.contentMapper.inaccessibleApexProperties.enumDescriptions.1%",
+            "%configuration.contentMapper.inaccessibleApexProperties.enumDescriptions.2%"
+          ],
+          "default": "include as deprecated",
+          "markdownDescription": "%configuration.contentMapper.inaccessibleApexProperties.markdownDescription%"
+        },
+        "lwcBolts.contentMapper.respectForceIgnore": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%configuration.contentMapper.respectForceIgnore.markdownDescription%"
+        },
+        "lwcBolts.contentMapper.suppressDiagnosticsExtensions": {
+          "type": "array",
+          "default": [
+            ".cls",
+            ".xml",
+            ".html"
+          ],
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^\\.[^/\\\\]+$",
+            "patternErrorMessage": "%configuration.contentMapper.suppressDiagnosticsExtensions.items.patternErrorMessage%"
+          },
+          "markdownDescription": "%configuration.contentMapper.suppressDiagnosticsExtensions.markdownDescription%"
+        },
+        "lwcBolts.contentMapper.useVSCodeNode": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%configuration.contentMapper.useVSCodeNode.markdownDescription%"
+        },
+        "lwcBolts.contentMapper.disabledMetadataTypes": {
+          "type": "array",
+          "default": [],
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "ApexClass",
+              "ContentAsset",
+              "CustomField",
+              "CustomLabel",
+              "CustomLabels",
+              "CustomObject",
+              "CustomPermission",
+              "LightningComponentBundle",
+              "LightningMessageChannel",
+              "StaticResource"
+            ]
+          },
+          "markdownDescription": "%configuration.contentMapper.disabledMetadataTypes.markdownDescription%"
+        }
+      }
+    }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "build:extension": "vsce package",
-    "publish": "npx vsce publish && npx ovsx publish",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./dist/test/runTest.js",
-    "test:nonext": "mocha --require ts-node/register src/test/suite/non-ext-tests/parser.test.ts"
+    "vscode:prepublish": "npm run build",
+    "build:extension": "npm run build && node scripts/package.mjs",
+    "build:extension:local": "npm run build && node scripts/package.mjs --local",
+    "publish": "node scripts/package.mjs --publish",
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && npm run build -w @lwc-bolts/lightning-base-components -w @lwc-bolts/sf2ts -w @lwc-bolts/sfdx-project -w @lwc-bolts/project-setup -w @lwc-bolts/typescript-content-mapper",
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc --watch -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "l10n:export": "vscode-l10n-dev export --outDir ./l10n ./src",
+    "pretest": "npm run build",
+    "test": "node --conditions=@lwc-bolts/source --test 'test/**/*.test.mjs'"
   },
   "devDependencies": {
-    "@types/node": "18.x",
-    "@types/vscode": "^1.84.0",
-    "@typescript-eslint/eslint-plugin": "^6.9.0",
-    "@typescript-eslint/parser": "^6.9.0",
-    "@vscode/test-electron": "^2.3.6",
-    "eslint": "^8.52.0"
+    "@types/node": "^22.20.5",
+    "@types/vscode": "^1.125.0",
+    "@vscode/l10n-dev": "^0.0.35",
+    "jsonc-parser": "^3.3.1",
+    "typescript": "7.1.0-beta"
   },
   "dependencies": {
-    "@lwc-bolts/typescript-plugin": "^0.0.6"
+    "@lwc-bolts/project-setup": "^1.0.0",
+    "@lwc-bolts/typescript-content-mapper": "^1.0.0",
+    "@vscode/vsce": "^4.1.0"
+  },
+  "allowScripts": {
+    "@vscode/vsce-sign": true
   }
 }

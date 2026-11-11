@@ -1,0 +1,24 @@
+exports[`Convert:CustomField > Transform Custom Field 1`] = `
+declare module "@salesforce/schema/Test_Object__c.Test_Checkbox__c" {
+  /**
+   * @description Test field of type checkbox
+   * @inlineHelpText Test it helptest
+   */
+  const Test_Checkbox__c: {
+    fieldApiName: "Test_Checkbox__c";
+    objectApiName: "Test_Object__c";
+  };
+  export default Test_Checkbox__c;
+}
+declare namespace Apex {
+  interface Test_Object__c {
+    /**
+     * @description Test field of type checkbox
+     * @inlineHelpText Test it helptest
+     */
+    Test_Checkbox__c?: boolean;
+  }
+  interface __lwcSObjects { "test_object__c": Test_Object__c; }
+}
+
+`;

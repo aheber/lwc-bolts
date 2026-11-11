@@ -1,7 +1,8 @@
 node_modules
-packages/sf2ts/lib-cjs
 .DS_Store
 dist
 .sfdx
 .sf
 .pmdcache
+*.vsix
+.vscode-test/

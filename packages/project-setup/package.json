@@ -1,0 +1,50 @@
+{
+  "name": "@lwc-bolts/project-setup",
+  "version": "1.0.0",
+  "description": "Sets up an SFDX project's TypeScript configuration for the lwc-bolts content mapper (TypeScript 7), and keeps it in step with sfdx-project.json",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "exports": {
+    ".": {
+      "@lwc-bolts/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./managed": {
+      "@lwc-bolts/source": "./src/managed.ts",
+      "types": "./dist/managed.d.ts",
+      "default": "./dist/managed.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --conditions=@lwc-bolts/source --test 'test/**/*.test.ts'"
+  },
+  "dependencies": {
+    "@lwc-bolts/sfdx-project": "^1.0.0",
+    "jsonc-parser": "^3.3.1"
+  },
+  "devDependencies": {
+    "@lwc-bolts/typescript-content-mapper": "^1.0.0",
+    "@types/node": "^22.20.5",
+    "typescript": "7.1.0-beta"
+  }
+}

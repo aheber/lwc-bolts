@@ -1,0 +1,23 @@
+exports[`Convert:CustomPermission > Omits a missing description 1`] = `
+declare module "@salesforce/customPermission/Perm" {
+  /**
+   * Perm
+   */
+  const hasPerm: true | undefined;
+  export default hasPerm;
+}
+
+`;
+
+exports[`Convert:CustomPermission > Transform Custom Permission 1`] = `
+declare module "@salesforce/customPermission/TestPerm" {
+  /**
+   * Disable DLRS
+   *
+   * @description Test permission that does stuff
+   */
+  const hasTestPerm: true | undefined;
+  export default hasTestPerm;
+}
+
+`;

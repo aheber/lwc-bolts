@@ -1,0 +1,20 @@
+exports[`Convert:LightningComponentBundle > Declares the c/ module by re-exporting the component's module 1`] = `
+/**
+ * Record Card
+ *
+ * @description Shows a record.
+ */
+declare module "c/recordCard" {
+  const recordCard: typeof import("./recordCard.js");
+  export = recordCard;
+}
+
+`;
+
+exports[`Convert:LightningComponentBundle > Maps a bundle without a label to its root element 1`] = `
+declare module "c/plain" {
+  const plain: typeof import("./plain.js");
+  export = plain;
+}
+
+`;

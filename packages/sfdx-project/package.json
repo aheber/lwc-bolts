@@ -1,0 +1,44 @@
+{
+  "name": "@lwc-bolts/sfdx-project",
+  "version": "1.0.0",
+  "description": "An SFDX project as lwc-bolts sees it: its package directories and lwc folders, metadata type resolution through source-deploy-retrieve, and the Salesforce extensions' SObject definitions",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "exports": {
+    ".": {
+      "@lwc-bolts/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --conditions=@lwc-bolts/source --test 'test/**/*.test.ts'"
+  },
+  "dependencies": {
+    "@salesforce/source-deploy-retrieve": "^13.7.1",
+    "jsonc-parser": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "7.1.0-beta"
+  }
+}

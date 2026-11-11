@@ -12,25 +12,36 @@
       "processId": "${command:PickProcess}"
     },
     {
+      // Builds the extension and the content mapper, then opens a new window running this extension.
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension"],
       "outFiles": ["${workspaceFolder}/packages/vscode-extension/dist/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "Build the extension and the content mapper"
     },
     {
-      "name": "Extension Tests",
+      // Builds the extension and the content mapper, then opens the test fixture you pick in a window
+      // running this extension. The picker's options are the folders in tests/fixtures (a test in
+      // the extension checks they match).
+      "name": "Run Extension on a test fixture",
       "type": "extensionHost",
       "request": "launch",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension",
-        "--extensionTestsPath=${workspaceFolder}/packages/vscode-extension/dist/test/suite/index"
+        "${workspaceFolder}/tests/fixtures/${input:testFixture}"
       ],
-      "outFiles": [
-        "${workspaceFolder}/packages/vscode-extension/dist/test/**/*.js"
-      ],
-      "preLaunchTask": "${defaultBuildTask}"
+      "outFiles": ["${workspaceFolder}/packages/vscode-extension/dist/**/*.js"],
+      "preLaunchTask": "Build the extension and the content mapper"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "testFixture",
+      "type": "pickString",
+      "description": "The test fixture to open with the extension",
+      "options": ["example-project", "decomposed-labels", "managed-packages"],
+      "default": "example-project"
     }
   ]
 }

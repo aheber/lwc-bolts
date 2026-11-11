@@ -1,0 +1,13 @@
+{
+  "name": "example-project",
+  "private": true,
+  "description": "SFDX fixture project for trying @lwc-bolts/typescript-content-mapper in VS Code",
+  "scripts": {
+    "typecheck": "tsc --runExternalCode -p force-app/main/default/lwc/jsconfig.json"
+  },
+  "devDependencies": {
+    "@lwc-bolts/typescript-content-mapper": "file:../../../packages/typescript-content-mapper",
+    "lwc": "npm:@lwc/engine-core@^8.28.2",
+    "typescript": "7.1.0-beta"
+  }
+}

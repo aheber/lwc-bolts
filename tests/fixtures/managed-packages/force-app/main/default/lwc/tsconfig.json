@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    // jsconfig.json implies these, but this is a tsconfig.json.
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": []
+  },
+  "include": [
+    // One entry per packageDirectories path in sfdx-project.json.
+    "../../../../force-app",
+    // include the local cache of managed package code
+    "../../../../managed",
+    // The Salesforce extensions' typings for modules the content mapper doesn't declare. The rest of
+    // .sfdx/typings/lwc duplicates the mapper's @salesforce/... modules, so only these files are included.
+    "../../../../.sfdx/typings/lwc/apex.d.ts",
+    "../../../../.sfdx/typings/lwc/schema.d.ts",
+    "../../../../.sfdx/typings/lwc/lds.d.ts",
+    "../../../../.sfdx/typings/lwc/messageservice.d.ts",
+    "../../../../.sfdx/typings/lwc/lightning.d.ts",
+    // SObject definitions from "SFDX: Refresh SObject Definitions", which the mapper declares as Apex
+    // types (Apex.Account, ...) and @salesforce/schema modules.
+    "../../../../.sfdx/tools/sobjects"
+  ],
+  "contentMappers": [
+    {
+      "package": "@lwc-bolts/typescript-content-mapper",
+      "extensions": [".cls", ".xml", ".html"],
+      // This fixture keeps the Salesforce extensions' jsconfig.json and puts a tsconfig.json next to it.
+      "options": { "lwcConfigFile": "tsconfig.json" }
+    }
+  ]
+}

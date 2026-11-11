@@ -1,0 +1,346 @@
+exports[`Convert:ApexClass > Carries ApexDoc comments to classes, fields, methods and parameters 1`] = `
+declare namespace Apex {
+  /**
+   * Account helpers.
+   *
+   * @author Someone
+   */
+  interface Accounts {
+    /**
+     * The record name
+     */
+    name?: string;
+    /**
+     * Internal counter
+     *
+     * @deprecated not exposed; property must be @AuraEnabled, public or global
+     */
+    count?: number;
+  }
+  namespace Accounts {
+    /**
+     * Inner doc
+     */
+    interface Inner {}
+  }
+}
+declare module "@salesforce/apex/Accounts.load" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * Accounts load(Id recordId, Integer depth)
+   * \`\`\`
+   *
+   * Loads an account by its Id.
+   *
+   * @param recordId the record
+   *   to load
+   * @param DEPTH how many levels deep
+   * @returns the account
+   * @example
+   *   load({ recordId: '001' });
+   */
+  const load: {
+    (param: { /** the record to load */ recordId: string; /** how many levels deep */ depth: number }): Promise<Apex.Accounts>;
+    adapter: import("lwc").WireAdapterConstructor<
+      { /** the record to load */ recordId: string; /** how many levels deep */ depth: number },
+      { error?: unknown; data?: Apex.Accounts; }
+    >;
+  };
+  export default load;
+}
+declare module "@salesforce/apex/Accounts.other" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * void other()
+   * \`\`\`
+   *
+   * Documented after the annotation
+   */
+  const other: {
+    (): Promise<void>;
+  };
+  export default other;
+}
+declare module "@salesforce/apex/Accounts.plain" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * void plain()
+   * \`\`\`
+   */
+  const plain: {
+    (): Promise<void>;
+  };
+  export default plain;
+}
+
+`;
+
+exports[`Convert:ApexClass > Class Properties 1`] = `
+declare namespace Apex {
+  interface TestClass1 {
+    prop1?: string;
+    prop2?: number;
+    /** @deprecated not exposed; property must be @AuraEnabled, public or global */
+    prop3?: number;
+    /** @deprecated not exposed; property must be @AuraEnabled, public or global */
+    prop4?: string;
+    /** @deprecated not exposed; property must be non-static */
+    prop5?: string;
+    /** @deprecated not exposed; property must be @AuraEnabled */
+    prop6?: string;
+  }
+}
+declare module "@salesforce/apex/TestClass1.method1" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * List<String> method1(String blarg, String yip)
+   * \`\`\`
+   */
+  const method1: {
+    (param: { blarg: string; yip: string }): Promise<string[]>;
+  };
+  export default method1;
+}
+declare module "@salesforce/apex/TestClass1.method2" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * List<String> method2(String blarg, String yip)
+   * \`\`\`
+   */
+  const method2: {
+    (param: { blarg: string; yip: string }): Promise<string[]>;
+    adapter: import("lwc").WireAdapterConstructor<
+      { blarg: string; yip: string },
+      { error?: unknown; data?: string[]; }
+    >;
+  };
+  export default method2;
+}
+
+`;
+
+exports[`Convert:ApexClass > Continuation 1`] = `
+declare namespace Apex {
+  interface SampleContinuationClass {
+    /** @deprecated not exposed; property must be @AuraEnabled, non-static, public or global */
+    LONG_RUNNING_SERVICE_URL?: string;
+  }
+}
+declare module "@salesforce/apexContinuation/SampleContinuationClass.startRequest" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * Object startRequest()
+   * \`\`\`
+   */
+  const startRequest: {
+    (): Promise<unknown>;
+    adapter: import("lwc").WireAdapterConstructor<
+      never,
+      { error?: unknown; data?: unknown; }
+    >;
+  };
+  export default startRequest;
+}
+declare module "@salesforce/apex/SampleContinuationClass.processResponse" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * Object processResponse(List<String> labels, Object state)
+   * \`\`\`
+   */
+  const processResponse: {
+    (param: { labels: string[]; state: unknown }): Promise<unknown>;
+    adapter: import("lwc").WireAdapterConstructor<
+      { labels: string[]; state: unknown },
+      { error?: unknown; data?: unknown; }
+    >;
+  };
+  export default processResponse;
+}
+
+`;
+
+exports[`Convert:ApexClass > Declares Apex types globally when the namespace is null 1`] = `
+interface Outer {
+  child?: Outer.Inner;
+}
+declare namespace Outer {
+  interface Inner {
+    name?: string;
+  }
+}
+declare module "@salesforce/apex/Outer.get" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * Outer.Inner get(Outer o)
+   * \`\`\`
+   */
+  const get: {
+    (param: { o: Outer }): Promise<Outer.Inner>;
+  };
+  export default get;
+}
+
+`;
+
+exports[`Convert:ApexClass > Declares Apex types in a custom (dotted) namespace 1`] = `
+declare namespace Acme.Apex {
+  interface Outer {
+    child?: Acme.Apex.Outer.Inner;
+  }
+  namespace Outer {
+    interface Inner {
+      name?: string;
+    }
+  }
+}
+declare module "@salesforce/apex/Outer.get" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * Outer.Inner get(Outer o)
+   * \`\`\`
+   */
+  const get: {
+    (param: { o: Acme.Apex.Outer }): Promise<Acme.Apex.Outer.Inner>;
+  };
+  export default get;
+}
+
+`;
+
+exports[`Convert:ApexClass > Inner Class 1`] = `
+declare namespace Apex {
+  interface TestClass1 {
+    prop1?: string;
+    /** @deprecated not exposed; property must be non-static */
+    prop4?: string;
+  }
+  namespace TestClass1 {
+    interface TestClass2 {
+      prop2?: number;
+      /** @deprecated not exposed; property must be @AuraEnabled, public or global */
+      prop3?: number;
+    }
+  }
+}
+declare module "@salesforce/apex/TestClass1.method1" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * List<TestClass1.TestClass2> method1(TestClass1 blarg, TestClass1.TestClass2 yip)
+   * \`\`\`
+   */
+  const method1: {
+    (param: { blarg: Apex.TestClass1; yip: Apex.TestClass1.TestClass2 }): Promise<Apex.TestClass1.TestClass2[]>;
+    adapter: import("lwc").WireAdapterConstructor<
+      { blarg: Apex.TestClass1; yip: Apex.TestClass1.TestClass2 },
+      { error?: unknown; data?: Apex.TestClass1.TestClass2[]; }
+    >;
+  };
+  export default method1;
+}
+
+`;
+
+exports[`Convert:ApexClass > Parse AuraEnabled Method 1`] = `
+declare namespace Apex {
+  interface TestClass1 {}
+}
+declare module "@salesforce/apex/TestClass1.method1" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * void method1()
+   * \`\`\`
+   */
+  const method1: {
+    (): Promise<void>;
+  };
+  export default method1;
+}
+
+`;
+
+exports[`Convert:ApexClass > Parse Cacheable AuraEnabled Method 1`] = `
+declare namespace Apex {
+  interface TestClass1 {}
+}
+declare module "@salesforce/apex/TestClass1.method1" {
+  /**
+   * ---
+   * **Apex**
+   *
+   * \`\`\`apex
+   * void method1()
+   * \`\`\`
+   */
+  const method1: {
+    (): Promise<void>;
+    adapter: import("lwc").WireAdapterConstructor<
+      never,
+      { error?: unknown; data?: void; }
+    >;
+  };
+  export default method1;
+}
+
+`;
+
+exports[`Convert:ApexClass > SObject definitions > exposes fields without @AuraEnabled and documents them from block comments 1`] = `
+declare namespace Apex {
+  interface Account {
+    AccountNumber?: string;
+    Contacts?: Apex.Contact[];
+    CreatedBy?: Apex.User;
+    CreatedDate?: string;
+    /**
+     * The account's annual revenue,
+     * in the org's currency.
+     */
+    AnnualRevenue?: number;
+    Owner?: Record<string, unknown>;
+    Records?: unknown;
+  }
+}
+
+`;
+
+exports[`Convert:ApexClass > SObject definitions > skips fields without a type 1`] = `
+declare namespace Apex {
+  interface UriEvent {
+    Message?: string;
+    UserId?: string;
+  }
+}
+
+`;

@@ -3,17 +3,25 @@
   "private": true,
   "version": "0.0.1",
   "description": "Lightning Bolts is an enrichment package for Lightning Web Components (LWC)",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "lwc",
     "lightning-web-components"
   ],
   "workspaces": [
+    "packages/lightning-base-components",
     "packages/sf2ts",
-    "packages/typescript-plugin"
+    "packages/sfdx-project",
+    "packages/project-setup",
+    "packages/sf-plugin",
+    "packages/typescript-content-mapper",
+    "packages/vscode-extension"
   ],
   "author": {
     "name": "Anthony Heber",
@@ -22,10 +30,14 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@vscode/vsce": "^3.2.2",
-    "prettier": "^3.5.2"
+    "@vscode/vsce": "^4.0.0",
+    "ovsx": "^0.10.1",
+    "prettier": "3.6.2"
   },
-  "dependencies": {
-    "ovsx": "^0.10.1"
+  "overrides": {
+    "jws": "^4.0.1"
+  },
+  "allowScripts": {
+    "@vscode/vsce-sign": true
   }
 }

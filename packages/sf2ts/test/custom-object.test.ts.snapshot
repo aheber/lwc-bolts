@@ -1,0 +1,42 @@
+exports[`Convert:CustomObject > Apex record types > declares only the Id of standard objects 1`] = `
+declare namespace Apex {
+  interface Account {
+    Id?: string;
+  }
+  interface __lwcSObjects { "account": Account; }
+}
+
+`;
+
+exports[`Convert:CustomObject > Transform Custom Object 1`] = `
+declare module "@salesforce/schema/Test_Object__c" {
+  /**
+   * @description Object representing test data
+   */
+  const Test_Object__c: {
+    objectApiName: "Test_Object__c";
+  };
+  export default Test_Object__c;
+}
+declare namespace Apex {
+  /**
+   * @description Object representing test data
+   */
+  interface Test_Object__c {
+    Id?: string;
+    Name?: string;
+    IsDeleted?: boolean;
+    CreatedById?: string;
+    CreatedBy?: Apex.User;
+    CreatedDate?: string;
+    LastModifiedById?: string;
+    LastModifiedBy?: Apex.User;
+    LastModifiedDate?: string;
+    SystemModstamp?: string;
+    OwnerId?: string;
+  }
+  interface User {}
+  interface __lwcSObjects { "test_object__c": Test_Object__c; "user": User; }
+}
+
+`;

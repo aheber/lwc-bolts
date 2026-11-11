@@ -1,0 +1,11 @@
+exports[`Convert:LightningMessageChannel > Omits missing documentation and maps a channel without a label to the root element 1`] = `
+declare module "@salesforce/messageChannel/Bare__c" {
+  const Bare__c: string & { readonly __messageChannel: "Bare__c" };
+  export default Bare__c;
+}
+declare module "@salesforce/messageChannel/c__Bare__c" {
+  const Bare__c: string & { readonly __messageChannel: "Bare__c" };
+  export default Bare__c;
+}
+
+`;

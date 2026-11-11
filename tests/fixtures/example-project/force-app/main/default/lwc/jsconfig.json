@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "types": []
+  },
+  "include": [
+    "../../../../force-app",
+    "../../../../common",
+    "../../../../sales",
+    "../../../../.sfdx/typings/lwc/apex.d.ts",
+    "../../../../.sfdx/typings/lwc/schema.d.ts",
+    "../../../../.sfdx/typings/lwc/lds.d.ts",
+    "../../../../.sfdx/typings/lwc/messageservice.d.ts",
+    "../../../../.sfdx/typings/lwc/lightning.d.ts",
+    "../../../../.sfdx/tools/sobjects"
+  ],
+  "contentMappers": [
+    {
+      "package": "@lwc-bolts/typescript-content-mapper",
+      "extensions": [
+        ".cls",
+        ".xml",
+        ".html"
+      ]
+    }
+  ],
+  "typeAcquisition": {
+    "include": [
+      "jest"
+    ]
+  }
+}

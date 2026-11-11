@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Toast Requested</masterLabel>
+    <isExposed>true</isExposed>
+    <description>Published to ask the shell to show a toast.</description>
+    <lightningMessageFields>
+        <fieldName>title</fieldName>
+        <description>The toast title</description>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <fieldName>variant</fieldName>
+        <description>success, warning, error or info</description>
+    </lightningMessageFields>
+</LightningMessageChannel>

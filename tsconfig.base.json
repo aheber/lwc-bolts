@@ -1,0 +1,18 @@
+{
+  // Compiler options shared by the packages' tsconfig.json files, which add what they include. Named
+  // tsconfig.base.json, not tsconfig.json, so editors and tsc don't pick it up for files outside the
+  // packages, such as the test fixtures', which have their own configs.
+  "compilerOptions": {
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+    "module": "nodenext",
+    "target": "es2023",
+    "lib": ["es2023"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["node"],
+    "customConditions": ["@lwc-bolts/source"]
+  }
+}

@@ -1,0 +1,17 @@
+// See https://go.microsoft.com/fwlink/?LinkId=733558 for the tasks.json format.
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // What the extension runs in a development window: the content mapper (from its dist, as TypeScript
+      // launches it) and the packages it uses, and the extension itself, whose build also builds project-setup.
+      "label": "Build the extension and the content mapper",
+      "type": "shell",
+      "command": "npm run build -w @lwc-bolts/lightning-base-components -w @lwc-bolts/sf2ts -w @lwc-bolts/sfdx-project -w @lwc-bolts/typescript-content-mapper && npm run build -w lwc-bolts-vscode",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "silent"
+      }
+    }
+  ]
+}

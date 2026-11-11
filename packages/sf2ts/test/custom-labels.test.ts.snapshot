@@ -1,0 +1,30 @@
+exports[`Convert:CustomLabels > Generate declaration from custom labels 1`] = `
+declare module "@salesforce/label/c.Account" {
+  /**
+   * "Label Value"
+   *
+   * @description Account Description
+   */
+  const lblAccount: string;
+  export default lblAccount;
+}
+declare module "@salesforce/label/c.Australia" {
+  /**
+   * "Australia"
+   *
+   * @description Australia
+   */
+  const lblAustralia: string;
+  export default lblAustralia;
+}
+declare module "@salesforce/label/c.Austria" {
+  /**
+   * "Austria"
+   *
+   * @description Austria
+   */
+  const lblAustria: string;
+  export default lblAustria;
+}
+
+`;

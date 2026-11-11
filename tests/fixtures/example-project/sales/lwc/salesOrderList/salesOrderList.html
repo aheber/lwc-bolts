@@ -1,0 +1,16 @@
+<template>
+    <c-base-card title="Recent Orders" count={myCount} lwc:ref="card" ontoggle={handleCardToggle}>
+        <img src={logoUrl} alt="Sales" />
+        <input type="search" lwc:ref="search" />
+        <template lwc:if={hasOrders}>
+            <template for:each={rows} for:item="row">
+                <p key={row.recordId}>{row.name}: {row.formattedAmount} ({row.formattedDate})</p>
+            </template>
+        </template>
+        <template lwc:else>
+            <p>{labels.noRecords}</p>
+        </template>
+        <button lwc:if={canApprove} onclick={handleClick}>{labels.save}</button>
+        <button lwc:ref="robot1">{labels.cancel}</button>
+    </c-base-card>
+</template>

@@ -1,0 +1,44 @@
+{
+  "name": "@lwc-bolts/lightning-base-components",
+  "version": "1.0.0",
+  "description": "Definitions of the Salesforce lightning-* base components (properties, methods, events), consolidated from the LWC language server and the sfdx-lwc-jest stubs with manual overrides",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Anthony Heber",
+    "email": "anthony@heber.dev",
+    "url": "https://github.com/aheber"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "exports": {
+    ".": {
+      "@lwc-bolts/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --conditions=@lwc-bolts/source --test 'test/**/*.test.ts'",
+    "generate": "node scripts/generate.ts",
+    "compare-docs": "node scripts/compare-docs.ts"
+  },
+  "devDependencies": {
+    "@lwc/template-compiler": "~9.4.3",
+    "@types/node": "^22.20.5",
+    "jsonc-parser": "^3.3.1",
+    "typescript": "7.1.0-beta"
+  }
+}
