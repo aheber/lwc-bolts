@@ -30,7 +30,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@vscode/vsce": "^4.0.0",
+    "@vscode/vsce": "^4.1.0",
     "ovsx": "^0.10.1",
     "prettier": "3.6.2"
   },

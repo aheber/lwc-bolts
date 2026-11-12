@@ -169,8 +169,7 @@
   },
   "dependencies": {
     "@lwc-bolts/project-setup": "^1.0.0",
-    "@lwc-bolts/typescript-content-mapper": "^1.0.0",
-    "@vscode/vsce": "^4.1.0"
+    "@lwc-bolts/typescript-content-mapper": "^1.0.0"
   },
   "allowScripts": {
     "@vscode/vsce-sign": true
